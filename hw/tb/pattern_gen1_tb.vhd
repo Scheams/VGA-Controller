@@ -73,9 +73,9 @@ begin
     elsif (s_red_o = "0000") and (s_green_o = "0000") and (s_blue_o="1111") then
       s_colour <= BLUE;
     elsif (s_red_o = "1111") and (s_green_o = "1111") and (s_blue_o="1111") then
-        s_colour <= BLACK;
+        s_colour <= WHITE;
     elsif (s_red_o = "0000") and (s_green_o = "0000") and (s_blue_o="0000") then
-      s_colour <= WHITE;
+      s_colour <= BLACK;
     else
       report "Colour is in undefined state (not Red, Green, Blue or Black)!"
         severity warning;

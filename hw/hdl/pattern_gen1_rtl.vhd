@@ -46,13 +46,13 @@ begin
         green_o <= "0000";
         blue_o  <= "1111";
       when 3 =>           -- Black
-        red_o   <= "1111";
-        green_o <= "1111";
-        blue_o  <= "1111";
-      when others =>      -- White
         red_o   <= "0000";
         green_o <= "0000";
         blue_o  <= "0000";
+      when others =>      -- White
+        red_o   <= "1111";
+        green_o <= "1111";
+        blue_o  <= "1111";
     end case;
   end process p_process;
 
