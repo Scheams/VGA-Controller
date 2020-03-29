@@ -53,6 +53,11 @@ architecture sim of pattern_gen2_tb is
   -- Signal for colour information
   signal s_colour  : t_colour;
 
+  signal s_v_back_porch  : std_logic := '0';
+  signal s_v_front_porch : std_logic := '0';
+  signal s_h_back_porch  : std_logic := '0';
+  signal s_h_front_porch : std_logic := '0';
+
 begin
 
   -- Initialize device under test
@@ -67,8 +72,8 @@ begin
     blue_o  => s_blue_o
   );
 
-  s_rst_i <= '0' after 40 ns;
-  s_clk_i <= not s_clk_i after 40 ns;
+  s_rst_i <= '0' after 20 ns;
+  s_clk_i <= not s_clk_i after 20 ns;
 
   ------------------------------------------------------------------------------
   -- Map the RGB outputs of DUT to a readable enum
@@ -88,34 +93,54 @@ begin
     end if;
   end process p_map_colour;
 
-  ------------------------------------------------------------------------------
-  -- Increase vertical and horizontal pixel index
-  ------------------------------------------------------------------------------
-  p_sim : process
+  p_sim: process
   begin
 
-    wait for 1 ns;
-    s_v_px_i <= (others => '0');
-    s_h_px_i <= (others => '0');
+    wait for 40 ns;
 
-    IL: loop
-      -- Increment vertical px index
-      s_v_px_i <= std_logic_vector(unsigned(s_v_px_i) + to_unsigned(1, 10));
-      wait for 1 ns;
+    loop
 
-      -- Vertical px overflow
-      if (s_v_px_i = std_logic_vector(to_unsigned(639, 10))) then
+      -- V Back Porch
+      s_v_back_porch <= '1';
+      for i in 1 to 26400 loop
+        wait for 40 ns;
+      end loop;
+      s_v_back_porch <= '0';
 
-        -- Reset vertical px, increment horizontal px
-        s_v_px_i <= (others => '0');
-        s_h_px_i <= std_logic_vector(unsigned(s_h_px_i) + to_unsigned(1, 10));
-        wait for 1 ns;
+      -- Lines
+      for y in 1 to 480 loop
 
-        -- Horizontal px overflow, reset
-        if (s_h_px_i = std_logic_vector(to_unsigned(479, 10))) then
-          s_h_px_i <= (others => '0');
-        end if;
-      end if;
+        -- H Sync + Back Porch
+        s_h_back_porch <= '1';
+        for i in 1 to 144 loop
+          wait for 40 ns;
+        end loop;
+        s_h_back_porch <= '0';
+
+        s_v_px_i <= std_logic_vector(to_signed(y, s_v_px_i'length));
+
+        -- RGB Data
+        for x in 1 to 640 loop
+          s_h_px_i <= std_logic_vector(to_signed(x, s_h_px_i'length));
+          wait for 40 ns;
+        end loop;
+
+        -- H Front Porch
+        s_h_front_porch <= '1';
+        for i in 1 to 16 loop
+          wait for 40 ns;
+        end loop;
+        s_h_front_porch <= '0';
+
+      end loop;
+
+      -- V Front Porch
+      s_v_front_porch <= '1';
+      for i in 1 to 8000 loop
+        wait for 40 ns;
+      end loop;
+      s_v_front_porch <= '0';
+
     end loop;
 
   end process p_sim;

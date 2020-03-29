@@ -1,6 +1,19 @@
 {
+    "editor.renderWhitespace": "boundary",
+    "editor.renderControlCharacters": false,
+    "breadcrumbs.enabled": true,
+    "editor.detectIndentation": false,
+    "window.zoomLevel": 0,
+    "editor.wordWrap": "on",
     "editor.tabSize": 2,
     "editor.rulers": [
         80
-    ]
+    ],
+    "editor.formatOnType": true,
+    "files.trimTrailingWhitespace": true,
+    "vhdl.enableStutterComments": true,
+    "vhdl.enableStutterDelimiters": true,
+    "vhdl.stutterCompletionsBlockWidth": 80,
+    "vhdl.stutterCompletionsMaxWidth": 80,
+    "vhdl.suggestLibraryCase": "lower",
 }
