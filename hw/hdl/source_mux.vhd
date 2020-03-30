@@ -21,7 +21,13 @@ use ieee.std_logic_1164.all;
 entity source_mux is
 
   port (
-    placeholder : inout std_logic
+    sw_sync_i   : in  std_logic_vector (2 downto 0);
+    rgb_pg1_i   : in  std_logic_vector (11 downto 0);
+    rgb_pg2_i   : in  std_logic_vector (11 downto 0);
+    rgb_mem1_i  : in  std_logic_vector (11 downto 0);
+    rgb_mem2_i  : in  std_logic_vector (11 downto 0);
+
+    rgb_vga_o   : out std_logic_vector (11 downto 0)
   );
 
 end entity source_mux;
