@@ -21,7 +21,17 @@ use ieee.std_logic_1164.all;
 entity vga_ctrl is
 
   port (
-    placeholder : inout std_logic
+    rst_i    : in  std_logic;
+    clk_i    : in  std_logic;
+    rgb_i    : in  std_logic_vector (11 downto 0);
+
+    h_sync_o : out std_logic;
+    v_sync_o : out std_logic;
+    red_o    : out std_logic_vector (3 downto 0);
+    green_o  : out std_logic_vector (3 downto 0);
+    blue_o   : out std_logic_vector (3 downto 0);
+    px_x_o   : out std_logic_vector (9 downto 0);
+    px_y_o   : out std_logic_vector (9 downto 0)
   );
 
 end entity vga_ctrl;
