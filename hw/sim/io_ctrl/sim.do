@@ -1,4 +1,4 @@
-vsim -novopt -t ns -lib work work.io_ctrl
+vsim -novopt -t ns -lib work work.io_ctrl_tb
 view *
 do wave.do
-run 1000ns
+run 15 ms
