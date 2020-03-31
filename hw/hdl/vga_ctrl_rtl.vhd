@@ -5,8 +5,9 @@
 -- File : vga_ctrl_rtl.vhd
 -- Author : Christoph Amon
 -- Company : FH Technikum
--- Last update: 30.03.2020
+-- Last update: 31.03.2020
 -- Platform : ModelSim - Starter Edition 10.5b
+-- Language: VHDL 1076-2008
 --------------------------------------------------------------------------------
 -- Description: VGA Control Unit
 --------------------------------------------------------------------------------
@@ -19,106 +20,152 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+library work;
+use work.vga_ctrl_pkg.all;
+
 architecture rtl of vga_ctrl is
 
-  signal s_line_cnt   : std_logic_vector (9 downto 0);
-  signal s_px_cnt     : std_logic_vector (9 downto 0);
-  signal s_px_y       : std_logic_vector (9 downto 0);
-  signal s_px_x       : std_logic_vector (9 downto 0);
+  constant C_H_SYNC_CMP_VAL : std_logic_vector (n_px-1 downto 0) :=
+    std_logic_vector(to_unsigned(h_px_sync_pulse, n_px));
+  constant C_H_BACKPORCH_CMP_VAL : std_logic_vector (n_px-1 downto 0) :=
+    std_logic_vector(to_unsigned(h_px_back_porch, n_px));
+  constant C_H_DATA_CMP_VAL : std_logic_vector (n_px-1 downto 0) :=
+    std_logic_vector(to_unsigned(h_px_visible_area, n_px));
+  constant C_H_FRONTPORCH_CMP_VAL : std_logic_vector (n_px-1 downto 0) :=
+    std_logic_vector(to_unsigned(h_px_front_porch, n_px));
 
-  type t_h_stage is (S_H_IDLE, S_H_SYNC, S_H_BACKPORCH, S_H_DATA, S_H_FRONTPORCH);
-  type t_v_stage is (S_V_IDLE, S_V_SYNC, S_V_BACKPORCH, S_V_VISIBLE, S_VFRONTPORCH);
+  constant C_V_SYNC_CMP_VAL : std_logic_vector (n_px-1 downto 0) :=
+    std_logic_vector(to_unsigned(v_ln_sync_pulse, n_px));
+  constant C_V_BACKPORCH_CMP_VAL : std_logic_vector (n_px-1 downto 0) :=
+    std_logic_vector(to_unsigned(v_ln_back_porch, n_px));
+  constant C_V_DATA_CMP_VAL : std_logic_vector (n_px-1 downto 0) :=
+    std_logic_vector(to_unsigned(v_ln_visible_area, n_px));
+  constant C_V_FRONTPORCH_CMP_VAL : std_logic_vector (n_px-1 downto 0) :=
+    std_logic_vector(to_unsigned(v_ln_front_porch, n_px));
 
-  signal s_h_state : t_h_stage;
-  signal s_v_state : t_v_stage;
+  signal s_v_counter : std_logic_vector (n_px-1 downto 0);
+  signal s_h_counter : std_logic_vector (n_px-1 downto 0);
+
+  signal s_h_state : t_state;
+  signal s_v_state : t_state;
 
 begin
 
-  p_v_sync: process (rst_i, clk_i)
+  p_horizontal: process (rst_i, clk_i)
+    variable v_v_counter : std_logic_vector (n_px-1 downto 0);
+    variable v_h_counter : std_logic_vector (n_px-1 downto 0);
   begin
 
     if rst_i = '1' then
 
-      s_line_cnt <= (others => '0');
-      s_px_cnt <= (others => '0');
-      px_y_o <= (others => '0');
-      px_x_o <= (others => '0');
+      h_sync_o <= '0';
+      v_sync_o <= '0';
+
+      s_h_state <= S_IDLE;
+      s_v_state <= S_IDLE;
+
+      s_v_counter <= (others => '0');
+      s_h_counter <= (others => '0');
+
+      v_v_counter := (others => '0');
+      v_h_counter := (others => '0');
 
     elsif clk_i'event and (clk_i = '1') then
 
       h_sync_o <= '0';
       v_sync_o <= '0';
 
-      red_o <= (others => '0');
-      green_o <= (others => '0');
-      blue_o <= (others => '0');
+      v_h_counter := std_logic_vector(unsigned(v_h_counter) + 1);
 
-      s_h_state <= S_H_IDLE;
-      s_v_state <= S_V_IDLE;
+      case s_h_state is
 
-      s_px_cnt <= std_logic_vector(unsigned(s_px_cnt) + 1);
+        when S_SYNC =>
+          if v_h_counter = C_H_SYNC_CMP_VAL then
+            s_h_state <= S_BACKPORCH;
+            v_h_counter := (others => '0');
+          end if;
 
-      if unsigned(s_px_cnt) < to_unsigned(96, s_px_cnt'length) then
-        -- H Sync Pulse
-        h_sync_o <= '1';
-        s_h_state <= S_H_SYNC;
+        when S_BACKPORCH =>
+          if v_h_counter = C_H_BACKPORCH_CMP_VAL then
+            s_h_state <= S_DATA;
+            v_h_counter := (others => '0');
+          end if;
 
-      elsif unsigned(s_px_cnt) < to_unsigned(96 + 48, s_px_cnt'length) then
-        -- H Back Porch
-        s_h_state <= S_H_BACKPORCH;
+        when S_DATA =>
+          if v_h_counter = C_H_DATA_CMP_VAL then
+            s_h_state <= S_FRONTPORCH;
+            v_h_counter := (others => '0');
+          end if;
 
-      elsif unsigned(s_px_cnt) < to_unsigned(96 + 48 + 640, s_px_cnt'length) then
-        -- Data
-        px_x_o <= std_logic_vector(unsigned(s_px_cnt) - (96 + 48));
-        s_h_state <= S_H_DATA;
-        if s_v_state = S_V_VISIBLE then
-          red_o <= rgb_i (3 downto 0);
-          green_o <= rgb_i (7 downto 4);
-          blue_o <= rgb_i (11 downto 8);
-        end if;
+        when S_FRONTPORCH =>
+          if v_h_counter = C_H_FRONTPORCH_CMP_VAL then
+            s_h_state <= S_SYNC;
+            v_h_counter := (others => '0');
+            v_v_counter := std_logic_vector(unsigned(v_v_counter) + 1);
+          end if;
 
-      elsif unsigned(s_px_cnt) < to_unsigned(96 + 48 + 640 + 16, s_px_cnt'length) then
-        -- H Front Porch
-        s_h_state <= S_H_FRONTPORCH;
+        when others =>
+          s_h_state <= S_SYNC;
+          v_h_counter := (others => '0');
 
-        if s_px_cnt = std_logic_vector(to_unsigned(96 + 48 + 640 + 16 - 1, s_px_cnt'length)) then
-          s_px_cnt <= (others => '0');
-          s_line_cnt <= std_logic_vector(unsigned(s_line_cnt) + 1);
-        end if;
+      end case;
 
-      else
-        s_px_cnt <= (others => '0');
-        s_line_cnt <= std_logic_vector(unsigned(s_line_cnt) + 1);
-      end if;
+      case s_v_state is
 
-      if unsigned(s_line_cnt) < to_unsigned(2, s_line_cnt'length) then
-        -- V Sync Pulse
-        v_sync_o <= '1';
-        s_v_state <= S_V_SYNC;
+        when S_SYNC =>
+          if v_v_counter = C_V_SYNC_CMP_VAL then
+            s_v_state <= S_BACKPORCH;
+            v_v_counter := (others => '0');
+          end if;
 
-      elsif unsigned(s_line_cnt) < to_unsigned(2 + 33, s_line_cnt'length) then
-        -- V Back Porch
-        s_v_state <= S_V_BACKPORCH;
+        when S_BACKPORCH =>
+          if v_v_counter = C_V_BACKPORCH_CMP_VAL then
+            s_v_state <= S_DATA;
+            v_v_counter := (others => '0');
+          end if;
 
-      elsif unsigned(s_line_cnt) < to_unsigned(2 + 33 + 480, s_line_cnt'length) then
-        -- Visible Area
-        px_y_o <= std_logic_vector(unsigned(s_line_cnt) - (2 + 33));
-        s_v_state <= S_V_VISIBLE;
+        when S_DATA =>
+          if v_v_counter = C_V_DATA_CMP_VAL then
+            s_v_state <= S_FRONTPORCH;
+            v_v_counter := (others => '0');
+          end if;
 
-      elsif unsigned(s_line_cnt) < to_unsigned(2 + 33 + 480 + 10, s_line_cnt'length) then
-        -- V Front Porch
-        s_v_state <= S_VFRONTPORCH;
+        when S_FRONTPORCH =>
+          if v_v_counter = C_V_FRONTPORCH_CMP_VAL then
+            s_v_state <= S_SYNC;
+            v_v_counter := (others => '0');
+          end if;
 
-        if s_line_cnt = std_logic_vector(to_unsigned(2 + 33 + 480 + 10 - 1, s_line_cnt'length)) and
-           s_px_cnt = std_logic_vector(to_unsigned(96 + 48 + 640 + 16 - 1, s_px_cnt'length)) then
-          s_line_cnt <= (others => '0');
-        end if;
-      else
-        s_line_cnt <= (others => '0');
-      end if;
+        when others =>
+          s_v_state <= S_SYNC;
+          v_v_counter := (others => '0');
+
+      end case;
+
+      s_v_counter <= v_v_counter;
+      s_h_counter <= v_h_counter;
 
     end if;
 
-  end process p_v_sync;
+  end process p_horizontal;
+
+  p_rgb: process (s_h_state, s_h_counter, s_v_state, s_v_counter)
+  begin
+
+    if s_h_state = S_DATA and s_v_state = S_DATA then
+      red_o <= red_i;
+      green_o <= green_i;
+      blue_o <= blue_i;
+      px_x_o <= s_h_counter;
+      px_y_o <= s_v_counter;
+    else
+      red_o <= (others => '0');
+      green_o <= (others => '0');
+      blue_o <= (others => '0');
+      px_x_o <= (others => '0');
+      px_y_o <= (others => '0');
+    end if;
+
+  end process p_rgb;
 
 end architecture rtl;

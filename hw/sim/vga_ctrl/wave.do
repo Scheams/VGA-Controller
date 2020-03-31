@@ -11,9 +11,11 @@ add wave -noupdate /vga_ctrl_tb/s_green_o
 add wave -noupdate /vga_ctrl_tb/s_blue_o
 add wave -noupdate -radix unsigned /vga_ctrl_tb/s_px_x_o
 add wave -noupdate -radix unsigned /vga_ctrl_tb/s_px_y_o
+add wave -noupdate -format Analog-Step -height 74 -max 479.0 -radix unsigned /vga_ctrl_tb/u_dut/s_v_counter
+add wave -noupdate -format Analog-Step -height 74 -max 639.0 -radix unsigned /vga_ctrl_tb/u_dut/s_h_counter
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 10} {99389 ns} 0}
-quietly wave cursor active 1
+WaveRestoreCursors
+quietly wave cursor active 0
 configure wave -namecolwidth 213
 configure wave -valuecolwidth 136
 configure wave -justifyvalue left
