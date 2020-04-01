@@ -26,7 +26,7 @@ architecture rtl of source_mux is
 
 begin
 
-  p_mux: process (sw_sync_i)
+  p_mux: process (sw_sync_i, rgb_pg1_i, rgb_pg2_i, rgb_mem1_i, rgb_mem2_i)
   begin
     if sw_sync_i(2) = '1' then
       rgb_vga_o <= rgb_mem2_i;
