@@ -29,6 +29,21 @@ end vga_top_tb;
 
 architecture sim of vga_top_tb is
 
+  component vga_monitor
+    generic(
+      g_no_frames : integer range 1 to 99 := 1;
+      g_path      : string                := "vga_output/"
+      );
+    port(
+      s_reset_i     : in std_logic;
+      s_vga_red_i   : in std_logic_vector(3 downto 0);
+      s_vga_green_i : in std_logic_vector(3 downto 0);
+      s_vga_blue_i  : in std_logic_vector(3 downto 0);
+      s_vga_hsync_i : in std_logic;
+      s_vga_vsync_i : in std_logic
+      );
+  end component vga_monitor;
+
   component vga_top
     generic (
       n_colour : integer := 4;
@@ -59,6 +74,20 @@ architecture sim of vga_top_tb is
 
 begin
 
+  u_monitor: vga_monitor
+  generic map (
+    g_no_frames => 1,
+    g_path      => "vga_outputs/"
+  )
+  port map (
+    s_reset_i      => s_rst_i,
+    s_vga_red_i    => s_red_o,
+    s_vga_green_i  => s_green_o,
+    s_vga_blue_i   => s_blue_o,
+    s_vga_hsync_i  => s_h_sync_o,
+    s_vga_vsync_i  => s_v_sync_o
+  );
+
   u_dut: vga_top
   port map (
     rst_i     => s_rst_i,
@@ -78,10 +107,10 @@ begin
   p_sim: process
   begin
 
-    wait for 1 us;
-
     s_pb_i <= (others => '0');
     s_sw_i <= (others => '0');
+
+    wait;
 
   end process p_sim;
 

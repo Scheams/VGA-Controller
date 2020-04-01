@@ -141,12 +141,9 @@ architecture structural of vga_top is
 begin
 
   s_pg1_rgb  <= (s_pg1_blue,  s_pg1_green,  s_pg1_red );
-  s_pg2_rgb <= (0 => '1', others => '0');
-  s_mem1_rgb <= (1 => '1', others => '0');
-  s_mem2_rgb <= (2 => '1', others => '0');
-  -- s_pg2_rgb  <= (s_pg2_blue,  s_pg2_green,  s_pg2_red );
-  -- s_mem1_rgb <= (s_mem1_blue, s_mem1_green, s_mem1_red);
-  -- s_mem2_rgb <= (s_mem2_blue, s_mem2_green, s_mem2_red);
+  s_pg2_rgb  <= (s_pg2_blue,  s_pg2_green,  s_pg2_red );
+  s_mem1_rgb <= (s_mem1_blue, s_mem1_green, s_mem1_red);
+  s_mem2_rgb <= (s_mem2_blue, s_mem2_green, s_mem2_red);
 
   (s_mux_blue,  s_mux_green,  s_mux_red ) <= s_mux_rgb;
 

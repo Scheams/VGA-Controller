@@ -1,5 +1,7 @@
 
 vcom ../../hdl/vga_ctrl_pkg.vhd
+vcom ../../hdl/vga_top_pkg.vhd
+
 vcom ../../hdl/vga_ctrl.vhd
 vcom ../../hdl/vga_ctrl_rtl.vhd
 vcom ../../hdl/vga_ctrl_cfg.vhd
@@ -16,9 +18,11 @@ vcom ../../hdl/source_mux.vhd
 vcom ../../hdl/source_mux_rtl.vhd
 vcom ../../hdl/source_mux_cfg.vhd
 
-vcom ../../hdl/vga_top_pkg.vhd
 vcom ../../hdl/vga_top.vhd
 vcom ../../hdl/vga_top_structural.vhd
 vcom ../../hdl/vga_top_cfg.vhd
+
+vcom ../../tb/vga_monitor/vga_monitor_.vhd
+vcom ../../tb/vga_monitor/vga_monitor_sim.vhd
 
 vcom ../../tb/vga_top_tb.vhd
