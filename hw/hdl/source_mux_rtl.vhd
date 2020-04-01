@@ -1,14 +1,17 @@
 --------------------------------------------------------------------------------
--- Title : Source MUX RTL Architecture
--- Project : VGA Controller
+-- Title :      Source MUX (RTL Architecture)
+-- Project :    VGA Controller
 --------------------------------------------------------------------------------
--- File : source_mux_rtl.vhd
--- Author : Christoph Amon
--- Company : FH Technikum
--- Last update: 30.03.2020
--- Platform : ModelSim - Starter Edition 10.5b
+-- File :       source_mux_rtl.vhd
+-- Author :     Christoph Amon
+-- Company :    FH Technikum
+-- Last update: 01.04.2020
+-- Platform :   ModelSim - Starter Edition 10.5b
+-- Language:    VHDL 1076-2008
 --------------------------------------------------------------------------------
--- Description: Source MUX Unit
+-- Description: The "Source MUX" unit maps different source input to the VGA
+--              controller unit. Depending on the position of 3 input switches
+--              the MUX selects the RGB information from 4 different sources.
 --------------------------------------------------------------------------------
 -- Revisions :
 -- Date         Version  Author           Description
