@@ -16,6 +16,7 @@
 -- Revisions :
 -- Date         Version  Author           Description
 -- 09.03.2020   v1.0.0   Christoph Amon   Initial stage
+-- 01.04.2020   v1.0.1   Christoph Amon   Swap horizontal-vertical
 --------------------------------------------------------------------------------
 
 library ieee;
@@ -41,8 +42,8 @@ begin
 
     elsif clk_i'event and (clk_i = '1') then
 
-      if v_px_i /= s_prev_px then
-        if v_px_i = std_logic_vector(to_unsigned(0, v_px_i'length)) then
+      if h_px_i /= s_prev_px then
+        if h_px_i = std_logic_vector(to_unsigned(0, h_px_i'length)) then
           s_counter <= C_STRIPE_WIDTH - 1;
           s_colour <= "0001";
         elsif s_counter = 0 then
@@ -53,13 +54,13 @@ begin
         end if;
       end if;
 
-      s_prev_px <= v_px_i;
+      s_prev_px <= h_px_i;
 
     end if;
 
   end process p_counter;
 
-  p_colour : process(v_px_i)
+  p_colour : process(s_colour)
   begin
     case s_colour is
       when "0001" =>      -- Red
