@@ -27,22 +27,37 @@ use ieee.std_logic_1164.all;
 entity io_debounce is
 
   generic (
-    f_sys      : integer := 100_000_000;
-    f_debounce : integer := 1_000;
+    -- FREQUENCY
+    -- f_sys: System clock frequency (default 100 MHz)
+    -- f_debounce: Debounce frequency (default 1 kHz)
+    f_sys       : integer := 100_000_000;
+    f_debounce  : integer := 1_000;
 
-    n_sw       : integer;
-    n_pb       : integer
+    -- DATA WIDTH
+    -- n_sw: Number of switches
+    -- n_pb: Number of push-buttons
+    n_sw        : integer;
+    n_pb        : integer
   );
 
   port (
-    clk_i : in std_logic;
-    rst_i : in std_logic;
+    -- SYSTEM
+    -- rst_i: System reset
+    -- clk_i: System clock
+    rst_i       : in std_logic;
+    clk_i       : in std_logic;
 
-    sw_i  : in std_logic_vector (n_sw-1 downto 0);
-    pb_i  : in std_logic_vector (n_pb-1 downto 0);
+    -- INPUTS
+    -- sw_i: Switch inputs
+    -- pb_i: Push-button inputs
+    sw_i        : in std_logic_vector (n_sw-1 downto 0);
+    pb_i        : in std_logic_vector (n_pb-1 downto 0);
 
-    sw_sync_o : out std_logic_vector (n_sw-1 downto 0);
-    pb_sync_o : out std_logic_vector (n_pb-1 downto 0)
+    -- OUTPUTS
+    -- sw_sync_o: Debounced switch output
+    -- pb_sync_o: Debounced push-button output
+    sw_sync_o   : out std_logic_vector (n_sw-1 downto 0);
+    pb_sync_o   : out std_logic_vector (n_pb-1 downto 0)
   );
 
 end entity io_debounce;

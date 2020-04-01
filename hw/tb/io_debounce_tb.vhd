@@ -26,16 +26,28 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity io_debounce_tb is
-end io_debounce_tb;
+end entity io_debounce_tb;
 
 architecture sim of io_debounce_tb is
 
-  constant C_F_SYS : integer := 25_000_000;
-  constant C_F_DB  : integer := 5_000_000;
-  constant C_N_SW  : integer := 2;
-  constant C_N_PB  : integer := 2;
+  ------------------------------------------------------------------------------
+  -- CONSTANTS
+  ------------------------------------------------------------------------------
 
-  constant C_T    : time := 1 sec / C_F_SYS;
+  -- C_F_SYS: Simulation system frequency
+  -- C_F_DB: Simulation debounce frequency (higher frequency than in real)
+  -- C_N_SW: Number of switches (use 2 for simulation)
+  -- C_N_PB: Number of push-buttons (use 2 for simulation)
+  -- C_T: Time of one period
+  constant C_F_SYS  : integer := 25_000_000;
+  constant C_F_DB   : integer := 5_000_000;
+  constant C_N_SW   : integer := 2;
+  constant C_N_PB   : integer := 2;
+  constant C_T      : time    := 1 sec / C_F_SYS;
+
+  ------------------------------------------------------------------------------
+  -- COMPONENTS
+  ------------------------------------------------------------------------------
 
   component io_debounce
     generic (
@@ -45,8 +57,8 @@ architecture sim of io_debounce_tb is
       n_pb       : integer
     );
     port (
-      clk_i : in std_logic;
       rst_i : in std_logic;
+      clk_i : in std_logic;
       sw_i  : in std_logic_vector (n_sw-1 downto 0);
       pb_i  : in std_logic_vector (n_pb-1 downto 0);
       sw_sync_o : out std_logic_vector (n_sw-1 downto 0);
@@ -54,22 +66,29 @@ architecture sim of io_debounce_tb is
     );
   end component;
 
+  ------------------------------------------------------------------------------
+  -- SIGNALS
+  ------------------------------------------------------------------------------
+
+  -- Signals for In- and Output of component
   signal s_clk_i : std_logic := '1';
   signal s_rst_i : std_logic := '1';
   signal s_sw_i  : std_logic_vector (C_N_SW-1 downto 0) := (others => '0');
   signal s_pb_i  : std_logic_vector (C_N_PB-1 downto 0) := (others => '0');
-
   signal s_sw_sync_o : std_logic_vector (C_N_SW-1 downto 0);
   signal s_pb_sync_o : std_logic_vector (C_N_PB-1 downto 0);
 
 begin
 
+  ------------------------------------------------------------------------------
+  -- Device under test
+  ------------------------------------------------------------------------------
   u_dut: io_debounce
   generic map (
-    f_sys => C_F_SYS,
-    f_debounce => C_F_DB,
-    n_sw => C_N_SW,
-    n_pb => C_N_PB
+    f_sys       => C_F_SYS,
+    f_debounce  => C_F_DB,
+    n_sw        => C_N_SW,
+    n_pb        => C_N_PB
   )
   port map (
     clk_i => s_clk_i,
@@ -81,9 +100,13 @@ begin
     pb_sync_o => s_pb_sync_o
   );
 
+  -- Create reset pulse and clock signal
   s_rst_i <= '0' after C_T/2;
   s_clk_i <= not s_clk_i after C_T/2;
 
+  ------------------------------------------------------------------------------
+  -- Simulate push buttons
+  ------------------------------------------------------------------------------
   p_pb: process
   begin
     s_pb_i(0) <= '1' after C_T;
@@ -91,6 +114,9 @@ begin
     wait;
   end process p_pb;
 
+  ------------------------------------------------------------------------------
+  -- Simulate switches
+  ------------------------------------------------------------------------------
   p_sw: process
   begin
     s_sw_i(0) <= '1' after C_T, '0' after 5*C_T, '1' after 10*C_T;
@@ -98,6 +124,9 @@ begin
     wait;
   end process p_sw;
 
+  ------------------------------------------------------------------------------
+  -- Check if debouncing behaves the right way
+  ------------------------------------------------------------------------------
   p_check: process
   begin
     wait for 6*C_T;
@@ -121,7 +150,6 @@ begin
       report "Stage 5 failed debounce!" severity error;
 
     wait;
-
   end process p_check;
 
 end sim;

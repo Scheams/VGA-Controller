@@ -66,8 +66,8 @@ architecture structural of vga_top is
       n_pb       : integer
     );
     port (
-      clk_i : in std_logic;
       rst_i : in std_logic;
+      clk_i : in std_logic;
       sw_i  : in std_logic_vector (n_sw-1 downto 0);
       pb_i  : in std_logic_vector (n_pb-1 downto 0);
       sw_sync_o : out std_logic_vector (n_sw-1 downto 0);
