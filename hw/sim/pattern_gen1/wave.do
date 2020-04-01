@@ -6,8 +6,9 @@ add wave -noupdate /pattern_gen1_tb/s_red_o
 add wave -noupdate /pattern_gen1_tb/s_green_o
 add wave -noupdate /pattern_gen1_tb/s_blue_o
 add wave -noupdate /pattern_gen1_tb/s_colour
+add wave -noupdate -format Analog-Step -height 74 -max 39.0 /pattern_gen1_tb/u_dut/s_counter
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {638 ns} 0}
+WaveRestoreCursors {{Cursor 1} {9061840 ns} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 199
 configure wave -valuecolwidth 59
@@ -23,4 +24,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {632 ns} {648 ns}
+WaveRestoreZoom {0 ns} {21 ms}

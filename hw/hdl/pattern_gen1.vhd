@@ -1,14 +1,17 @@
 --------------------------------------------------------------------------------
--- Title : Pattern Generator 1 Entity
--- Project : VGA Controller
+-- Title :      Pattern Generator 1 (Entity)
+-- Project :    VGA Controller
 --------------------------------------------------------------------------------
--- File : pattern_gen1.vhd
--- Author : Christoph Amon
--- Company : FH Technikum
--- Last update: 09.03.2020
--- Platform : ModelSim - Starter Edition 10.5b
+-- File :       pattern_gen1.vhd
+-- Author :     Christoph Amon
+-- Company :    FH Technikum
+-- Last update: 01.04.2020
+-- Platform :   ModelSim - Starter Edition 10.5b
+-- Language:    VHDL 1076-2008
 --------------------------------------------------------------------------------
--- Description: Entity for Pattern Generator 1
+-- Description: The "Pattern Generator 1" unit creates a defined pattern for
+--              the VGA controller. The generator creates horizontal stripes
+--              with Red-Green-Blue-Black order.
 --------------------------------------------------------------------------------
 -- Revisions :
 -- Date         Version  Author           Description
@@ -19,19 +22,23 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity pattern_gen1 is
-  port (
-    -- INPUTS
-    -- v_px_i: Vertical pixel index (0 - 639)
-    -- h_px_i: Horizontal pixel index (0 - 479)
-    v_px_i  : in  std_logic_vector (9 downto 0);
-    h_px_i  : in  std_logic_vector (9 downto 0);
 
-    -- OUTPUTS
-    -- red_o: 4-bit output for red
-    -- green_o: 4-bit output for green
-    -- blue_o: 4-bit output for blue
-    red_o   : out std_logic_vector (3 downto 0);
-    green_o : out std_logic_vector (3 downto 0);
-    blue_o  : out std_logic_vector (3 downto 0)
+  generic (
+    n_colour : integer;
+    n_px : integer;
+
+    monitor_width : integer
+  );
+
+  port (
+    rst_i   : in  std_logic;
+    clk_i   : in  std_logic;
+
+    v_px_i  : in  std_logic_vector (n_px-1 downto 0);
+    h_px_i  : in  std_logic_vector (n_px-1 downto 0);
+
+    red_o   : out std_logic_vector (n_colour-1 downto 0);
+    green_o : out std_logic_vector (n_colour-1 downto 0);
+    blue_o  : out std_logic_vector (n_colour-1 downto 0)
   );
 end entity pattern_gen1;
