@@ -82,11 +82,11 @@ architecture sim of vga_ctrl_tb is
   constant C_H_T_BACK_PORCH    : time := C_H_PX_BACK_PORCH   * C_T_CLK;
   constant C_H_T_WHOLE_LINE    : time := C_H_PX_WHOLE_LINE   * C_T_CLK;
 
-  constant C_V_T_VISIBLE_AREA  : time := C_V_LN_VISIBLE_AREA * C_T_CLK;
-  constant C_V_T_FRONT_PORCH   : time := C_V_LN_FRONT_PORCH  * C_T_CLK;
-  constant C_V_T_SYNC_PULSE    : time := C_V_LN_SYNC_PULSE   * C_T_CLK;
-  constant C_V_T_BACK_PORCH    : time := C_V_LN_BACK_PORCH   * C_T_CLK;
-  constant C_V_T_WHOLE_FRAME   : time := C_V_LN_WHOLE_FRAME  * C_T_CLK;
+  constant C_V_T_VISIBLE_AREA  : time := C_V_LN_VISIBLE_AREA * C_H_T_WHOLE_LINE;
+  constant C_V_T_FRONT_PORCH   : time := C_V_LN_FRONT_PORCH  * C_H_T_WHOLE_LINE;
+  constant C_V_T_SYNC_PULSE    : time := C_V_LN_SYNC_PULSE   * C_H_T_WHOLE_LINE;
+  constant C_V_T_BACK_PORCH    : time := C_V_LN_BACK_PORCH   * C_H_T_WHOLE_LINE;
+  constant C_V_T_WHOLE_FRAME   : time := C_V_LN_WHOLE_FRAME  * C_H_T_WHOLE_LINE;
 
   signal s_h_stamp : time := 0 ns;
   signal s_h_delta : time;
