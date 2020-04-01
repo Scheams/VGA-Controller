@@ -14,6 +14,10 @@ vcom ../../hdl/pattern_gen1.vhd
 vcom ../../hdl/pattern_gen1_rtl.vhd
 vcom ../../hdl/pattern_gen1_cfg.vhd
 
+vcom ../../hdl/pattern_gen2.vhd
+vcom ../../hdl/pattern_gen2_rtl.vhd
+vcom ../../hdl/pattern_gen2_cfg.vhd
+
 vcom ../../hdl/source_mux.vhd
 vcom ../../hdl/source_mux_rtl.vhd
 vcom ../../hdl/source_mux_cfg.vhd

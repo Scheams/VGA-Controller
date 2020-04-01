@@ -76,7 +76,7 @@ begin
 
   u_monitor: vga_monitor
   generic map (
-    g_no_frames => 1,
+    g_no_frames => 2,
     g_path      => "vga_outputs/"
   )
   port map (
@@ -109,6 +109,14 @@ begin
 
     s_pb_i <= (others => '0');
     s_sw_i <= (others => '0');
+
+    wait until s_v_sync_o = '1';
+
+    s_sw_i <= (others => '0');
+
+    wait until s_v_sync_o = '1';
+
+    s_sw_i <= (0 => '1', others => '0');
 
     wait;
 

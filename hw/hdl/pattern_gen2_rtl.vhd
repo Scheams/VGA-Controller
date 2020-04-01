@@ -38,19 +38,11 @@ begin
 
       v_v_cnt := (others => '0');
       v_h_cnt := (others => '0');
-      s_h_px_prev <= (others => '0');
+      s_h_px_prev <= (others => '1');
       s_colour <= "001";
       s_start_colour <= "001";
 
     elsif clk_i'event and (clk_i = '1') then
-
-      if v_px_i = std_logic_vector(to_unsigned(1, v_px_i'length))
-          and h_px_i = std_logic_vector(to_unsigned(1, h_px_i'length)) then
-        v_h_cnt := (others => '0');
-        v_v_cnt := (others => '0');
-        s_colour <= "001";
-        s_start_colour <= "001";
-      end if;
 
       if s_h_px_prev /= h_px_i then
         -- Every tick increase horizontal counter
@@ -63,7 +55,7 @@ begin
         end if;
 
         -- Horizontal pixel is at 1
-        if h_px_i = std_logic_vector(to_unsigned(1, h_px_i'length)) then
+        if h_px_i = std_logic_vector(to_unsigned(0, h_px_i'length)) then
           -- Increment vertical counter by 1
           v_v_cnt := std_logic_vector(unsigned(v_v_cnt) + 1);
 
@@ -77,6 +69,14 @@ begin
             s_colour <= s_start_colour;
           end if;
         end if;
+      end if;
+
+      if v_px_i = std_logic_vector(to_unsigned(0, v_px_i'length))
+          and h_px_i = std_logic_vector(to_unsigned(0, h_px_i'length)) then
+        v_h_cnt := (others => '0');
+        v_v_cnt := (others => '0');
+        s_colour <= "001";
+        s_start_colour <= "001";
       end if;
 
       s_h_px_prev <= h_px_i;

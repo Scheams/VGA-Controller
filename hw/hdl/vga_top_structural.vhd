@@ -106,6 +106,18 @@ architecture structural of vga_top is
     );
   end component pattern_gen1;
 
+  component pattern_gen2
+    port (
+      clk_i   : in  std_logic;
+      rst_i   : in  std_logic;
+      v_px_i  : in  std_logic_vector (9 downto 0);
+      h_px_i  : in  std_logic_vector (9 downto 0);
+      red_o   : out std_logic_vector (3 downto 0);
+      green_o : out std_logic_vector (3 downto 0);
+      blue_o  : out std_logic_vector (3 downto 0)
+    );
+  end component pattern_gen2;
+
   signal s_pb_sync    : std_logic_vector (3 downto 0);
   signal s_sw_sync    : std_logic_vector (2 downto 0);
 
@@ -180,7 +192,7 @@ begin
   u_io: io_debounce
   generic map (
     f_sys      => C_F_CLK,
-    f_debounce => 1000,
+    f_debounce => 1_000_000,
     n_sw       => sw_i'length,
     n_pb       => pb_i'length
   )
@@ -220,6 +232,17 @@ begin
     red_o   => s_pg1_red,
     green_o => s_pg1_green,
     blue_o  => s_pg1_blue
+  );
+
+  u_pg2: pattern_gen2
+  port map (
+    clk_i   => clk_i,
+    rst_i   => rst_i,
+    v_px_i  => s_px_v,
+    h_px_i  => s_px_h,
+    red_o   => s_pg2_red,
+    green_o => s_pg2_green,
+    blue_o  => s_pg2_blue
   );
 
 end architecture structural;
