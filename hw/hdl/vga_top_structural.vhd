@@ -5,7 +5,7 @@
 -- File :       vga_top_structural.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 01.04.2020
+-- Last update: 02.04.2020
 -- Platform :   ModelSim - Starter Edition 10.5b
 -- Language:    VHDL 1076-2008
 --------------------------------------------------------------------------------
@@ -25,6 +25,10 @@ library work;
 use work.vga_top_pkg.all;
 
 architecture structural of vga_top is
+
+  ------------------------------------------------------------------------------
+  -- COMPONENTS
+  ------------------------------------------------------------------------------
 
   component vga_ctrl
     generic (
@@ -91,9 +95,9 @@ architecture structural of vga_top is
 
   component pattern_gen1
     generic (
-      n_colour : integer;
-      n_px : integer;
-      i_h_res : integer
+      n_colour  : integer;
+      n_px      : integer;
+      i_h_res   : integer
     );
     port (
       rst_i   : in  std_logic;
@@ -107,6 +111,12 @@ architecture structural of vga_top is
   end component pattern_gen1;
 
   component pattern_gen2
+  generic (
+    n_colour  : integer;
+    n_px      : integer;
+    i_h_res   : integer;
+    i_v_res   : integer
+  );
     port (
       clk_i   : in  std_logic;
       rst_i   : in  std_logic;
@@ -118,32 +128,43 @@ architecture structural of vga_top is
     );
   end component pattern_gen2;
 
+  ------------------------------------------------------------------------------
+  -- SIGNALS
+  ------------------------------------------------------------------------------
+
+  -- Internal debounced push-buttons and switches
   signal s_pb_sync    : std_logic_vector (3 downto 0);
   signal s_sw_sync    : std_logic_vector (2 downto 0);
 
+  -- Internal horizontal and vertical pixel index
   signal s_px_h       : std_logic_vector (C_N_PX-1 downto 0);
   signal s_px_v       : std_logic_vector (C_N_PX-1 downto 0);
 
+  -- Internal RGB channels of Pattern Generator 1
   signal s_pg1_red    : std_logic_vector (C_N_COLOUR-1 downto 0);
   signal s_pg1_green  : std_logic_vector (C_N_COLOUR-1 downto 0);
   signal s_pg1_blue   : std_logic_vector (C_N_COLOUR-1 downto 0);
   signal s_pg1_rgb    : std_logic_vector (C_N_COLOUR*3-1 downto 0);
 
+  -- Internal RGB channels of Pattern Generator 2
   signal s_pg2_red    : std_logic_vector (C_N_COLOUR-1 downto 0);
   signal s_pg2_green  : std_logic_vector (C_N_COLOUR-1 downto 0);
   signal s_pg2_blue   : std_logic_vector (C_N_COLOUR-1 downto 0);
   signal s_pg2_rgb    : std_logic_vector (C_N_COLOUR*3-1 downto 0);
 
+  -- Internal RGB channels of Memory Control 1
   signal s_mem1_red    : std_logic_vector (C_N_COLOUR-1 downto 0);
   signal s_mem1_green  : std_logic_vector (C_N_COLOUR-1 downto 0);
   signal s_mem1_blue   : std_logic_vector (C_N_COLOUR-1 downto 0);
   signal s_mem1_rgb    : std_logic_vector (C_N_COLOUR*3-1 downto 0);
 
+  -- Internal RGB channels of Memory Control 2
   signal s_mem2_red    : std_logic_vector (C_N_COLOUR-1 downto 0);
   signal s_mem2_green  : std_logic_vector (C_N_COLOUR-1 downto 0);
   signal s_mem2_blue   : std_logic_vector (C_N_COLOUR-1 downto 0);
   signal s_mem2_rgb    : std_logic_vector (C_N_COLOUR*3-1 downto 0);
 
+  -- Internal RGB channels of MUX
   signal s_mux_red    : std_logic_vector (C_N_COLOUR-1 downto 0);
   signal s_mux_green  : std_logic_vector (C_N_COLOUR-1 downto 0);
   signal s_mux_blue   : std_logic_vector (C_N_COLOUR-1 downto 0);
@@ -152,13 +173,18 @@ architecture structural of vga_top is
 
 begin
 
+  -- Map all 3 RGB channels to one bus
   s_pg1_rgb  <= (s_pg1_blue,  s_pg1_green,  s_pg1_red );
   s_pg2_rgb  <= (s_pg2_blue,  s_pg2_green,  s_pg2_red );
   s_mem1_rgb <= (s_mem1_blue, s_mem1_green, s_mem1_red);
   s_mem2_rgb <= (s_mem2_blue, s_mem2_green, s_mem2_red);
 
+  -- Split RGB bus into 3 channels
   (s_mux_blue,  s_mux_green,  s_mux_red ) <= s_mux_rgb;
 
+  ------------------------------------------------------------------------------
+  -- VGA Controller
+  ------------------------------------------------------------------------------
   u_controller: vga_ctrl
   generic map (
     n_colour          => C_N_COLOUR,
@@ -189,10 +215,13 @@ begin
     px_v_o   => s_px_v
   );
 
+  ------------------------------------------------------------------------------
+  -- IO Debounce
+  ------------------------------------------------------------------------------
   u_io: io_debounce
   generic map (
     f_sys      => C_F_CLK,
-    f_debounce => 1_000_000,
+    f_debounce => C_F_DB,
     n_sw       => sw_i'length,
     n_pb       => pb_i'length
   )
@@ -205,6 +234,9 @@ begin
     pb_sync_o => s_pb_sync
   );
 
+  ------------------------------------------------------------------------------
+  -- Source Multiplexer
+  ------------------------------------------------------------------------------
   u_mux: source_mux
   generic map (
     n_colour => C_N_COLOUR
@@ -218,11 +250,14 @@ begin
     rgb_vga_o   => s_mux_rgb
   );
 
+  ------------------------------------------------------------------------------
+  -- Pattern Generator 1
+  ------------------------------------------------------------------------------
   u_pg1: pattern_gen1
   generic map (
-    n_colour      => C_N_COLOUR,
-    n_px          => C_N_PX,
-    i_h_res => C_H_PX_VISIBLE_AREA
+    n_colour  => C_N_COLOUR,
+    n_px      => C_N_PX,
+    i_h_res   => C_H_PX_VISIBLE_AREA
   )
   port map (
     rst_i   => rst_i,
@@ -234,7 +269,16 @@ begin
     blue_o  => s_pg1_blue
   );
 
+  ------------------------------------------------------------------------------
+  -- Pattern Generator 2
+  ------------------------------------------------------------------------------
   u_pg2: pattern_gen2
+  generic map (
+    n_colour  => C_N_COLOUR,
+    n_px      => C_N_PX,
+    i_h_res   => C_H_PX_VISIBLE_AREA,
+    i_v_res   => C_V_LN_VISIBLE_AREA
+  )
   port map (
     clk_i   => clk_i,
     rst_i   => rst_i,

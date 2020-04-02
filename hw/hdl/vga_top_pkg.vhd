@@ -5,7 +5,7 @@
 -- File :       vga_top_pkg.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 01.04.2020
+-- Last update: 02.04.2020
 -- Platform :   ModelSim - Starter Edition 10.5b
 -- Language:    VHDL 1076-2008
 --------------------------------------------------------------------------------
@@ -19,18 +19,27 @@
 
 package vga_top_pkg is
 
+  -- FREQUENCY
+  -- C_F_CLK: System clock frequency
+  -- C_F_DB: Button debounce frequency
   constant C_F_CLK : integer := 25_000_000;
-  constant C_T_CLK : time := 40 ns;
+  constant C_F_DB  : integer := 1_000_000;
 
+  -- DATA WIDTH
+  -- C_N_COLOUR: Colour bit depth
+  -- C_N_PX: Pixel information data width (2^C_N_PX-1 >= C_H_PX_WHOLE_LINE &
+  --         2^C_N_PX-1 >= C_V_LN_WHOLE_LINE)
   constant C_N_COLOUR : integer := 4;
   constant C_N_PX     : integer := 10;
 
+  -- HORIZONTAL SPECS
   constant C_H_PX_VISIBLE_AREA  : integer := 640;
   constant C_H_PX_FRONT_PORCH   : integer := 16;
   constant C_H_PX_SYNC_PULSE    : integer := 96;
   constant C_H_PX_BACK_PORCH    : integer := 48;
   constant C_H_PX_WHOLE_LINE    : integer := 800;
 
+  -- VERTICAL SPECS
   constant C_V_LN_VISIBLE_AREA  : integer := 480;
   constant C_V_LN_FRONT_PORCH   : integer := 10;
   constant C_V_LN_SYNC_PULSE    : integer := 2;

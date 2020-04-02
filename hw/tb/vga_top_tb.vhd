@@ -5,7 +5,7 @@
 -- File :       vga_top_tb.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 01.04.2020
+-- Last update: 02.04.2020
 -- Platform :   ModelSim - Starter Edition 10.5b
 -- Language:    VHDL 1076-2008
 --------------------------------------------------------------------------------
@@ -28,6 +28,10 @@ entity vga_top_tb is
 end vga_top_tb;
 
 architecture sim of vga_top_tb is
+
+  ------------------------------------------------------------------------------
+  -- COMPONENTS
+  ------------------------------------------------------------------------------
 
   component vga_monitor
     generic(
@@ -62,6 +66,11 @@ architecture sim of vga_top_tb is
     );
   end component vga_top;
 
+  ------------------------------------------------------------------------------
+  -- SIGNALS
+  ------------------------------------------------------------------------------
+
+  -- In- and Output signals
   signal s_rst_i     : std_logic := '1';
   signal s_clk_i     : std_logic := '1';
   signal s_pb_i      : std_logic_vector (3 downto 0);
@@ -74,6 +83,9 @@ architecture sim of vga_top_tb is
 
 begin
 
+  ------------------------------------------------------------------------------
+  -- VGA Monitor
+  ------------------------------------------------------------------------------
   u_monitor: vga_monitor
   generic map (
     g_no_frames => 2,
@@ -88,6 +100,9 @@ begin
     s_vga_vsync_i  => s_v_sync_o
   );
 
+  ------------------------------------------------------------------------------
+  -- Device under Test
+  ------------------------------------------------------------------------------
   u_dut: vga_top
   port map (
     rst_i     => s_rst_i,
@@ -101,21 +116,30 @@ begin
     blue_o    => s_blue_o
   );
 
+  -- Generate reset pulse and clock signal
   s_rst_i <= '0' after 200 ns;
   s_clk_i <= not s_clk_i after 20 ns;
 
+  ------------------------------------------------------------------------------
+  -- Simualtion process
+  ------------------------------------------------------------------------------
   p_sim: process
   begin
 
+    -- Reset all use inputs
     s_pb_i <= (others => '0');
     s_sw_i <= (others => '0');
 
+    -- Wait for first frame to start
     wait until s_v_sync_o = '1';
 
+    -- Set source to Pattern Generator 1
     s_sw_i <= (others => '0');
 
+    -- Wait for next frame start
     wait until s_v_sync_o = '1';
 
+    -- Set source to Pattern Generator 2
     s_sw_i <= (0 => '1', others => '0');
 
     wait;
