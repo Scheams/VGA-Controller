@@ -9,8 +9,8 @@ add wave -noupdate /vga_top_tb/s_v_sync_o
 add wave -noupdate /vga_top_tb/s_red_o
 add wave -noupdate /vga_top_tb/s_green_o
 add wave -noupdate /vga_top_tb/s_blue_o
-add wave -noupdate /vga_top_tb/u_dut/u_controller/px_x_o
-add wave -noupdate /vga_top_tb/u_dut/u_controller/px_y_o
+add wave -noupdate /vga_top_tb/u_dut/u_controller/px_h_o
+add wave -noupdate /vga_top_tb/u_dut/u_controller/px_v_o
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {6720806 ns} 0}
 quietly wave cursor active 0

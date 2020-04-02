@@ -53,8 +53,8 @@ architecture structural of vga_top is
       red_o    : out std_logic_vector (n_colour-1 downto 0);
       green_o  : out std_logic_vector (n_colour-1 downto 0);
       blue_o   : out std_logic_vector (n_colour-1 downto 0);
-      px_x_o   : out std_logic_vector (n_px-1 downto 0);
-      px_y_o   : out std_logic_vector (n_px-1 downto 0)
+      px_h_o   : out std_logic_vector (n_px-1 downto 0);
+      px_v_o   : out std_logic_vector (n_px-1 downto 0)
     );
   end component vga_ctrl;
 
@@ -185,8 +185,8 @@ begin
     red_o    => red_o,
     green_o  => green_o,
     blue_o   => blue_o,
-    px_x_o   => s_px_h,
-    px_y_o   => s_px_v
+    px_h_o   => s_px_h,
+    px_v_o   => s_px_v
   );
 
   u_io: io_debounce

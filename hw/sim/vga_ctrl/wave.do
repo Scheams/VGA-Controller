@@ -3,10 +3,10 @@ quietly WaveActivateNextPane {} 0
 add wave -noupdate -color Gray70 /vga_ctrl_tb/s_rst_i
 add wave -noupdate -color Gray70 /vga_ctrl_tb/s_clk_i
 add wave -noupdate -color Magenta /vga_ctrl_tb/s_h_sync_o
-add wave -noupdate -color Magenta -format Analog-Step -height 74 -max 479.0 -radix unsigned /vga_ctrl_tb/s_px_y_o
+add wave -noupdate -color Magenta -format Analog-Step -height 74 -max 479.0 -radix unsigned /vga_ctrl_tb/s_px_v_o
 add wave -noupdate -color Magenta /vga_ctrl_tb/s_h_state
 add wave -noupdate -color Gold /vga_ctrl_tb/s_v_sync_o
-add wave -noupdate -color Gold -format Analog-Step -height 74 -max 639.0 -radix unsigned /vga_ctrl_tb/s_px_x_o
+add wave -noupdate -color Gold -format Analog-Step -height 74 -max 639.0 -radix unsigned /vga_ctrl_tb/s_px_h_o
 add wave -noupdate -color Gold /vga_ctrl_tb/s_v_state
 add wave -noupdate -color Red /vga_ctrl_tb/s_red_o
 add wave -noupdate -color Green /vga_ctrl_tb/s_green_o
