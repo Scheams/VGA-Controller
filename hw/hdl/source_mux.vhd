@@ -5,7 +5,7 @@
 -- File :       source_mux.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 01.04.2020
+-- Last update: 02.04.2020
 -- Platform :   ModelSim - Starter Edition 10.5b
 -- Language:    VHDL 1076-2008
 --------------------------------------------------------------------------------
@@ -24,17 +24,26 @@ use ieee.std_logic_1164.all;
 entity source_mux is
 
   generic (
+    -- DATA WIDTH
+    -- n_colour: Bit depth of each colour
     n_colour : integer
   );
 
   port (
+    -- INPUTS
+    -- sw_sync_i: Debounced switches
+    -- rgb_pg1_i: RGB information from Pattern Generator 1
+    -- rgb_pg2_i: RGB information from Pattern Generator 2
+    -- rgb_mem1_i: RGB information from Memory Control 1
+    -- rgb_mem2_i: RGB information from Memory Control 2
     sw_sync_i   : in  std_logic_vector (2 downto 0);
-
     rgb_pg1_i   : in  std_logic_vector (3*n_colour-1 downto 0);
     rgb_pg2_i   : in  std_logic_vector (3*n_colour-1 downto 0);
     rgb_mem1_i  : in  std_logic_vector (3*n_colour-1 downto 0);
     rgb_mem2_i  : in  std_logic_vector (3*n_colour-1 downto 0);
 
+    -- OUTPUTS
+    -- rgb_vga_o: RGB information to VGA controller
     rgb_vga_o   : out std_logic_vector (3*n_colour-1 downto 0)
   );
 

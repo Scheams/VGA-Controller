@@ -5,7 +5,7 @@
 -- File :       source_mux_rtl.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 01.04.2020
+-- Last update: 02.04.2020
 -- Platform :   ModelSim - Starter Edition 10.5b
 -- Language:    VHDL 1076-2008
 --------------------------------------------------------------------------------
@@ -26,6 +26,14 @@ architecture rtl of source_mux is
 
 begin
 
+  ------------------------------------------------------------------------------
+  -- Multiplex different input sources to VGA output depending on switch
+  -- positions.
+  -- SW 0 LOW  (other LOW): Route Pattern Generator 1
+  -- SW 0 HIGH (other LOW): Route Pattern Generator 2
+  -- SW 1 HIGH (other X): Route Memory Control 1
+  -- SW 2 HIGH (other X): Route Memory Control 2
+  ------------------------------------------------------------------------------
   p_mux: process (sw_sync_i, rgb_pg1_i, rgb_pg2_i, rgb_mem1_i, rgb_mem2_i)
   begin
     if sw_sync_i(2) = '1' then

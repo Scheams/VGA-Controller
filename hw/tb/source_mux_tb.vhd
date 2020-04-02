@@ -5,7 +5,7 @@
 -- File :       source_mux_tb.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 01.04.2020
+-- Last update: 02.04.2020
 -- Platform :   ModelSim - Starter Edition 10.5b
 -- Language:    VHDL 1076-2008
 --------------------------------------------------------------------------------
@@ -27,7 +27,16 @@ end source_mux_tb;
 
 architecture sim of source_mux_tb is
 
+  ------------------------------------------------------------------------------
+  -- CONSTANTS
+  ------------------------------------------------------------------------------
+
+  -- C_N_COLOUR: Colour bit depth used
   constant C_N_COLOUR : integer := 4;
+
+  ------------------------------------------------------------------------------
+  -- COMPONENTS
+  ------------------------------------------------------------------------------
 
   component source_mux
     generic (
@@ -43,16 +52,23 @@ architecture sim of source_mux_tb is
     );
   end component source_mux;
 
+  ------------------------------------------------------------------------------
+  -- SIGNALS
+  ------------------------------------------------------------------------------
+
+  -- In- and Output signals
   signal s_sw_sync_i   : std_logic_vector (2 downto 0);
   signal s_rgb_pg1_i   : std_logic_vector (3*C_N_COLOUR-1 downto 0);
   signal s_rgb_pg2_i   : std_logic_vector (3*C_N_COLOUR-1 downto 0);
   signal s_rgb_mem1_i  : std_logic_vector (3*C_N_COLOUR-1 downto 0);
   signal s_rgb_mem2_i  : std_logic_vector (3*C_N_COLOUR-1 downto 0);
-
   signal s_rgb_vga_o   : std_logic_vector (3*C_N_COLOUR-1 downto 0);
 
 begin
 
+  ------------------------------------------------------------------------------
+  -- Device under test
+  ------------------------------------------------------------------------------
   u_dut: source_mux
   generic map (
     n_colour => C_N_COLOUR
@@ -66,6 +82,9 @@ begin
     rgb_vga_o   => s_rgb_vga_o
   );
 
+  ------------------------------------------------------------------------------
+  -- Simulate all switch positions and check if multiplex works correct
+  ------------------------------------------------------------------------------
   p_sim: process
   begin
 
@@ -74,6 +93,7 @@ begin
     s_rgb_mem1_i <= (2 => '1', others => '0');
     s_rgb_mem2_i <= (others => '1');
 
+    -- Check Pattern Gen 1
     s_sw_sync_i <= "000";
     wait for 1 ms;
     assert s_rgb_vga_o = s_rgb_pg1_i
@@ -81,6 +101,7 @@ begin
       severity error;
     wait for 1 ms;
 
+    -- Check Pattern Gen 2
     s_sw_sync_i <= "001";
     wait for 1 ms;
     assert s_rgb_vga_o = s_rgb_pg2_i
@@ -88,6 +109,7 @@ begin
       severity error;
     wait for 1 ms;
 
+    -- Check Mem Control 1 (Position 1)
     s_sw_sync_i <= "010";
     wait for 1 ms;
     assert s_rgb_vga_o = s_rgb_mem1_i
@@ -95,6 +117,7 @@ begin
       severity error;
     wait for 1 ms;
 
+    -- Check Mem Control 1 (Position 2)
     s_sw_sync_i <= "011";
     wait for 1 ms;
     assert s_rgb_vga_o = s_rgb_mem1_i
@@ -102,6 +125,7 @@ begin
       severity error;
     wait for 1 ms;
 
+    -- Check Mem Control 2 (all different positions)
     for i in 0 to 3 loop
       s_sw_sync_i <= std_logic_vector(unsigned(s_sw_sync_i) + 1);
       wait for 1 ms;
