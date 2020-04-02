@@ -1,14 +1,17 @@
 --------------------------------------------------------------------------------
--- Title : Pattern Generator 2 Entity
--- Project : VGA Controller
+-- Title :      Pattern Generator 2 (Entity)
+-- Project :    VGA Controller
 --------------------------------------------------------------------------------
--- File : pattern_gen2.vhd
--- Author : Christoph Amon
--- Company : FH Technikum
--- Last update: 29.03.2020
--- Platform : ModelSim - Starter Edition 10.5b
+-- File :       pattern_gen2.vhd
+-- Author :     Christoph Amon
+-- Company :    FH Technikum
+-- Last update: 02.04.2020
+-- Platform :   ModelSim - Starter Edition 10.5b
+-- Language:    VHDL 1076-2008
 --------------------------------------------------------------------------------
--- Description: Entity for Pattern Generator 2
+-- Description: The "Pattern Generator 2" unit creates a chess-like format with
+--              the colours Red-Green-Blue. Over the whole frame there are
+--              10 x 10 tiles.
 --------------------------------------------------------------------------------
 -- Revisions :
 -- Date         Version  Author           Description
@@ -19,23 +22,39 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity pattern_gen2 is
+  generic (
+    -- DATA WIDTH
+    -- n_colour: Bit depth of each colour
+    -- n_px: Width of data bus for pixel information
+    n_colour  : integer;
+    n_px      : integer;
+
+    -- VALUE
+    -- i_h_res: Resolution of width (horizontal pixel) of monitor
+    -- i_v_res: Resolution of height (vertical pixel) of monitor
+    i_h_res   : integer;
+    i_v_res   : integer
+  );
+
   port (
-    -- INPUTS
+    -- SYSTE;
     -- clk_i: System clock
     -- rst_i: System reset
-    -- v_px_i: Vertical pixel index (0 - 639)
-    -- h_px_i: Horizontal pixel index (0 - 479)
     clk_i   : in  std_logic;
     rst_i   : in  std_logic;
-    v_px_i  : in  std_logic_vector (9 downto 0);
-    h_px_i  : in  std_logic_vector (9 downto 0);
+
+    -- INPUTS
+    -- v_px_i: Vertical pixel information
+    -- h_px_i: Horizontal pixel information
+    v_px_i  : in  std_logic_vector (n_px-1 downto 0);
+    h_px_i  : in  std_logic_vector (n_px-1 downto 0);
 
     -- OUTPUTS
-    -- red_o: 4-bit output for red
-    -- green_o: 4-bit output for green
-    -- blue_o: 4-bit output for blue
-    red_o   : out std_logic_vector (3 downto 0);
-    green_o : out std_logic_vector (3 downto 0);
-    blue_o  : out std_logic_vector (3 downto 0)
+    -- red_o: Red colour output
+    -- green_o: Green colour output
+    -- blue_o: Blue colour output
+    red_o   : out std_logic_vector (n_colour-1 downto 0);
+    green_o : out std_logic_vector (n_colour-1 downto 0);
+    blue_o  : out std_logic_vector (n_colour-1 downto 0)
   );
 end entity pattern_gen2;

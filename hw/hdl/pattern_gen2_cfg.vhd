@@ -1,14 +1,17 @@
 --------------------------------------------------------------------------------
--- Title : Pattern Generator 2 RTL Configuration
--- Project : VGA Controller
+-- Title :      Pattern Generator 2 (Configuration)
+-- Project :    VGA Controller
 --------------------------------------------------------------------------------
--- File : pattern_gen2_cfg.vhd
--- Author : Christoph Amon
--- Company : FH Technikum
--- Last update: 29.03.2020
--- Platform : ModelSim - Starter Edition 10.5b
+-- File :       pattern_gen2_cfg.vhd
+-- Author :     Christoph Amon
+-- Company :    FH Technikum
+-- Last update: 02.04.2020
+-- Platform :   ModelSim - Starter Edition 10.5b
+-- Language:    VHDL 1076-2008
 --------------------------------------------------------------------------------
--- Description: RTL configuration for Pattern Generator 2
+-- Description: The "Pattern Generator 2" unit creates a chess-like format with
+--              the colours Red-Green-Blue. Over the whole frame there are
+--              10 x 10 tiles.
 --------------------------------------------------------------------------------
 -- Revisions :
 -- Date         Version  Author           Description
