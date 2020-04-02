@@ -1,14 +1,17 @@
 --------------------------------------------------------------------------------
--- Title : Pattern Generator 1 Testbench
--- Project : VGA Controller
+-- Title :      Pattern Generator 1 (Testbench)
+-- Project :    VGA Controller
 --------------------------------------------------------------------------------
--- File : pattern_gen1_tb.vhd
--- Author : Christoph Amon
--- Company : FH Technikum
--- Last update: 09.03.2020
--- Platform : ModelSim - Starter Edition 10.5b
+-- File :       pattern_gen1_tb.vhd
+-- Author :     Christoph Amon
+-- Company :    FH Technikum
+-- Last update: 02.04.2020
+-- Platform :   ModelSim - Starter Edition 10.5b
+-- Language:    VHDL 1076-2008
 --------------------------------------------------------------------------------
--- Description: Testbench for Pattern Generator 1
+-- Description: The "Pattern Generator 1" unit creates a defined pattern for
+--              the VGA controller. The generator creates horizontal stripes
+--              with Red-Green-Blue-Black order.
 --------------------------------------------------------------------------------
 -- Revisions :
 -- Date         Version  Author           Description
@@ -24,12 +27,28 @@ end entity pattern_gen1_tb;
 
 architecture sim of pattern_gen1_tb is
 
-  -- Define pattern generator 1 component
+  ------------------------------------------------------------------------------
+  -- CONSTANTS
+  ------------------------------------------------------------------------------
+
+  -- C_N_COLOUR: Bit width of one colour
+  -- C_N_PX: Bit width for pixel information bus
+  -- C_I_H_RES: Pixel width of monitor
+  -- C_T: Period for one clock cycle
+  constant C_N_COLOUR : integer := 4;
+  constant C_N_PX     : integer := 10;
+  constant C_I_H_RES  : integer := 640;
+  constant C_T        : time    := 40 ns;
+
+  ------------------------------------------------------------------------------
+  -- COMPONENTS
+  ------------------------------------------------------------------------------
+
   component pattern_gen1 is
     generic (
-      n_colour : integer;
-      n_px : integer;
-      monitor_width : integer
+      n_colour  : integer;
+      n_px      : integer;
+      i_h_res   : integer
     );
     port (
       rst_i   : in  std_logic;
@@ -42,10 +61,18 @@ architecture sim of pattern_gen1_tb is
     );
   end component pattern_gen1;
 
-  -- Define a typedef for better readablity during debugging
+  ------------------------------------------------------------------------------
+  -- TYPEDEFS
+  ------------------------------------------------------------------------------
+
+  -- t_colour: Represent colours and help during debugging
   type t_colour is (RED, GREEN, BLUE, BLACK, WHITE, UNKOWN);
 
-  -- All signals to the device under test
+  ------------------------------------------------------------------------------
+  -- SIGNALS
+  ------------------------------------------------------------------------------
+
+  -- Signals for In- and Outputs
   signal s_clk_i   : std_logic := '1';
   signal s_rst_i   : std_logic := '1';
   signal s_v_px_i  : std_logic_vector (9 downto 0) := (others => '0');
@@ -54,9 +81,13 @@ architecture sim of pattern_gen1_tb is
   signal s_green_o : std_logic_vector (3 downto 0);
   signal s_blue_o  : std_logic_vector (3 downto 0);
 
-  -- Signal for colour information
+  -- s_colour: Variable to track during simulation
   signal s_colour  : t_colour;
 
+  -- s_v_back_porch: Simulation info for vertical back porch
+  -- s_v_front_porch: Simulation info for vertical front porch
+  -- s_h_back_porch: Simulation info for horizontal back porch
+  -- s_h_front_porch: Simulation info for horizontal front porch
   signal s_v_back_porch  : std_logic := '0';
   signal s_v_front_porch : std_logic := '0';
   signal s_h_back_porch  : std_logic := '0';
@@ -64,12 +95,14 @@ architecture sim of pattern_gen1_tb is
 
 begin
 
-  -- Initialize device under test
+  ------------------------------------------------------------------------------
+  -- Device under test
+  ------------------------------------------------------------------------------
   u_dut : pattern_gen1
   generic map (
-    n_colour => 4,
-    n_px => 10,
-    monitor_width => 640
+    n_colour  => C_N_COLOUR,
+    n_px      => C_N_PX,
+    i_h_res   => C_I_H_RES
   )
   port map (
     clk_i   => s_clk_i,
@@ -81,8 +114,9 @@ begin
     blue_o  => s_blue_o
   );
 
-  s_rst_i <= '0' after 20 ns;
-  s_clk_i <= not s_clk_i after 20 ns;
+  -- Create reset pulse and clock
+  s_rst_i <= '0' after C_T/2;
+  s_clk_i <= not s_clk_i after C_T/2;
 
   ------------------------------------------------------------------------------
   -- Map the RGB outputs of DUT to a readable enum
@@ -109,18 +143,17 @@ begin
   ------------------------------------------------------------------------------
   -- Increase vertical and horizontal pixel index
   ------------------------------------------------------------------------------
-
   p_sim: process
   begin
 
-    wait for 40 ns;
+    wait for C_T;
 
     loop
 
       -- V Back Porch
       s_v_back_porch <= '1';
       for i in 0 to 26399 loop
-        wait for 40 ns;
+        wait for C_T;
       end loop;
       s_v_back_porch <= '0';
 
@@ -130,7 +163,7 @@ begin
         -- H Sync + Back Porch
         s_h_back_porch <= '1';
         for i in 0 to 143 loop
-          wait for 40 ns;
+          wait for C_T;
         end loop;
         s_h_back_porch <= '0';
 
@@ -139,13 +172,13 @@ begin
         -- RGB Data
         for x in 0 to 639 loop
           s_h_px_i <= std_logic_vector(to_unsigned(x, s_h_px_i'length));
-          wait for 40 ns;
+          wait for C_T;
         end loop;
 
         -- H Front Porch
         s_h_front_porch <= '1';
         for i in 0 to 15 loop
-          wait for 40 ns;
+          wait for C_T;
         end loop;
         s_h_front_porch <= '0';
 
@@ -154,7 +187,7 @@ begin
       -- V Front Porch
       s_v_front_porch <= '1';
       for i in 0 to 7999 loop
-        wait for 40 ns;
+        wait for C_T;
       end loop;
       s_v_front_porch <= '0';
 

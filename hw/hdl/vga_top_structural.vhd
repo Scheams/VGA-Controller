@@ -93,7 +93,7 @@ architecture structural of vga_top is
     generic (
       n_colour : integer;
       n_px : integer;
-      monitor_width : integer
+      i_h_res : integer
     );
     port (
       rst_i   : in  std_logic;
@@ -222,7 +222,7 @@ begin
   generic map (
     n_colour      => C_N_COLOUR,
     n_px          => C_N_PX,
-    monitor_width => C_H_PX_VISIBLE_AREA
+    i_h_res => C_H_PX_VISIBLE_AREA
   )
   port map (
     rst_i   => rst_i,
