@@ -90,7 +90,7 @@ begin
   ------------------------------------------------------------------------------
   u_monitor: vga_monitor
   generic map (
-    g_no_frames => 3,
+    g_no_frames => 4,
     g_path      => "vga_outputs/"
   )
   port map (
@@ -149,6 +149,12 @@ begin
 
     -- Set source to Memory Control 1
     s_sw_i <= (1 => '1', others => '0');
+
+    -- Wait for next frame start
+    wait until s_v_sync_o = '1';
+
+    -- Set source to Memory Control 1
+    s_sw_i <= (2 => '1', others => '0');
 
     wait;
 

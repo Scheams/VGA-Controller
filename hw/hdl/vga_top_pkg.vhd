@@ -35,6 +35,7 @@ package vga_top_pkg is
   constant C_N_COLOUR : integer := 4;
   constant C_N_PX     : integer := 10;
   constant C_N_ADDR1  : integer := 17;
+  constant C_N_ADDR2  : integer := 14;
 
   -- HORIZONTAL SPECS
   constant C_H_PX_VISIBLE_AREA  : integer := 640;

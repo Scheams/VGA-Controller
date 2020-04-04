@@ -1,4 +1,5 @@
 file copy -force ../../generate/ip_user_files/mem_init_files/rom_mem1.mif ./
+file copy -force ../../generate/ip_user_files/mem_init_files/rom_mem2.mif ./
 
 vcom ../../hdl/vga_ctrl_pkg.vhd
 vcom ../../hdl/vga_top_pkg.vhd
@@ -8,6 +9,7 @@ vlog ../../generate/clk_pll/clk_pll.v
 
 vlog ../../generate/rom_mem1/simulation/blk_mem_gen_v8_4.v
 vlog ../../generate/rom_mem1/sim/rom_mem1.v
+vlog ../../generate/rom_mem2/sim/rom_mem2.v
 
 vlog ../../generate/ip_user_files/sim_scripts/clk_pll/modelsim/glbl.v
 
@@ -30,6 +32,10 @@ vcom ../../hdl/pattern_gen2_cfg.vhd
 vcom ../../hdl/ctrl_mem1.vhd
 vcom ../../hdl/ctrl_mem1_rtl.vhd
 vcom ../../hdl/ctrl_mem1_cfg.vhd
+
+vcom ../../hdl/ctrl_mem2.vhd
+vcom ../../hdl/ctrl_mem2_rtl.vhd
+vcom ../../hdl/ctrl_mem2_cfg.vhd
 
 vcom ../../hdl/source_mux.vhd
 vcom ../../hdl/source_mux_rtl.vhd

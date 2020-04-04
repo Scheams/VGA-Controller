@@ -167,6 +167,35 @@ architecture structural of vga_top is
     );
   end component rom_mem1;
 
+  component ctrl_mem2
+    generic (
+      n_colour  : integer;
+      n_px      : integer;
+      n_addr    : integer;
+      i_h_res   : integer;
+      i_v_res   : integer
+    );
+    port (
+      rst_i       : in  std_logic;
+      clk_i       : in  std_logic;
+      v_px_i      : in  std_logic_vector (n_px-1 downto 0);
+      h_px_i      : in  std_logic_vector (n_px-1 downto 0);
+      rom_data_i  : in  std_logic_vector (3*n_colour-1 downto 0);
+      rom_addr_o  : out std_logic_vector (n_addr-1 downto 0);
+      red_o       : out std_logic_vector (n_colour-1 downto 0);
+      green_o     : out std_logic_vector (n_colour-1 downto 0);
+      blue_o      : out std_logic_vector (n_colour-1 downto 0)
+    );
+  end component ctrl_mem2;
+
+  component rom_mem2 is
+    port (
+      clka  : in  std_logic;
+      addra : in  std_logic_vector (13 downto 0);
+      douta : out std_logic_vector (11 downto 0)
+    );
+  end component rom_mem2;
+
   ------------------------------------------------------------------------------
   -- SIGNALS
   ------------------------------------------------------------------------------
@@ -185,6 +214,10 @@ architecture structural of vga_top is
   -- Internal ROM 1 communication signals
   signal s_rom1_data  : std_logic_vector (3*C_N_COLOUR-1 downto 0);
   signal s_rom1_addr  : std_logic_vector (C_N_ADDR1-1 downto 0);
+
+  -- Internal ROM 2 communication signals
+  signal s_rom2_data  : std_logic_vector (3*C_N_COLOUR-1 downto 0);
+  signal s_rom2_addr  : std_logic_vector (C_N_ADDR2-1 downto 0);
 
   -- Internal RGB channels of Pattern Generator 1
   signal s_pg1_red    : std_logic_vector (C_N_COLOUR-1 downto 0);
@@ -375,11 +408,44 @@ begin
   ------------------------------------------------------------------------------
   -- ROM 1
   ------------------------------------------------------------------------------
-  u_dut: rom_mem1
+  u_rom1: rom_mem1
   port map (
     clka  => clk_i,
     addra => s_rom1_addr,
     douta => s_rom1_data
+  );
+
+  ------------------------------------------------------------------------------
+  -- Memory Control 2
+  ------------------------------------------------------------------------------
+  u_mc2: ctrl_mem2
+  generic map (
+    n_colour  => C_N_COLOUR,
+    n_px      => C_N_PX,
+    n_addr    => C_N_ADDR2,
+    i_h_res   => C_H_PX_VISIBLE_AREA,
+    i_v_res   => C_V_LN_VISIBLE_AREA
+  )
+  port map (
+    rst_i       => rst_i,
+    clk_i       => clk_i,
+    v_px_i      => s_px_v,
+    h_px_i      => s_px_h,
+    rom_data_i  => s_rom2_data,
+    rom_addr_o  => s_rom2_addr,
+    red_o       => s_mem2_red,
+    green_o     => s_mem2_green,
+    blue_o      => s_mem2_blue
+  );
+
+  ------------------------------------------------------------------------------
+  -- ROM 2
+  ------------------------------------------------------------------------------
+  u_rom2: rom_mem2
+  port map (
+    clka  => clk_i,
+    addra => s_rom2_addr,
+    douta => s_rom2_data
   );
 
 end architecture structural;
