@@ -5,7 +5,7 @@
 -- File :       ctrl_mem1_rtl.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 03.04.2020
+-- Last update: 04.04.2020
 -- Platform :   ModelSim - Starter Edition 10.5b
 -- Language:    VHDL 1076-2008
 --------------------------------------------------------------------------------
@@ -16,6 +16,7 @@
 -- Revisions :
 -- Date         Version  Author           Description
 -- 03.04.2020   v1.0.0   Christoph Amon   Initial stage
+-- 04.04.2020   v1.0.1   Christoph Amon   Add limitation to address line
 --------------------------------------------------------------------------------
 
 library ieee;
@@ -70,12 +71,17 @@ begin
         end if;
       end if;
 
+      if unsigned(rom_addr_o) >= 76800-1 then
+        rom_addr_o <= std_logic_vector(to_unsigned(76800-1, rom_addr_o'length));
+      end if;
+
       -- Reset all states at begin of frame
       if unsigned(v_px_i) = 0 and unsigned(h_px_i) = 0 then
         s_cnt_img1 <= (others => '0');
         s_cnt_img2 <= (others => '0');
         s_cnt_img3 <= (others => '0');
         s_cnt_img4 <= (others => '0');
+        rom_addr_o <= (others => '0');
       end if;
 
       -- Set previous pixel info

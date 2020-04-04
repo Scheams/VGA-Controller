@@ -90,7 +90,7 @@ begin
   ------------------------------------------------------------------------------
   u_monitor: vga_monitor
   generic map (
-    g_no_frames => 2,
+    g_no_frames => 3,
     g_path      => "vga_outputs/"
   )
   port map (

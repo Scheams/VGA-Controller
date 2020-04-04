@@ -159,6 +159,14 @@ architecture structural of vga_top is
     );
   end component ctrl_mem1;
 
+  component rom_mem1 is
+    port (
+      clka  : in  std_logic;
+      addra : in  std_logic_vector (16 downto 0);
+      douta : out std_logic_vector (11 downto 0)
+    );
+  end component rom_mem1;
+
   ------------------------------------------------------------------------------
   -- SIGNALS
   ------------------------------------------------------------------------------
@@ -223,13 +231,15 @@ begin
   ------------------------------------------------------------------------------
   -- VGA PLL
   ------------------------------------------------------------------------------
-  dut: clk_pll
-  port map (
-    reset   => rst_i,
-    clk_i   => clk_i,
-    clk_o   => s_vga_clk,
-    locked  => s_locked
-  );
+  -- dut: clk_pll
+  -- port map (
+  --   reset   => rst_i,
+  --   clk_i   => clk_i,
+  --   clk_o   => s_vga_clk,
+  --   locked  => s_locked
+  -- );
+  s_vga_clk <= clk_i;
+  s_locked <= '1';
 
   ------------------------------------------------------------------------------
   -- VGA Controller
@@ -360,6 +370,16 @@ begin
     red_o       => s_mem1_red,
     green_o     => s_mem1_green,
     blue_o      => s_mem1_blue
+  );
+
+  ------------------------------------------------------------------------------
+  -- ROM 1
+  ------------------------------------------------------------------------------
+  u_dut: rom_mem1
+  port map (
+    clka  => clk_i,
+    addra => s_rom1_addr,
+    douta => s_rom1_data
   );
 
 end architecture structural;

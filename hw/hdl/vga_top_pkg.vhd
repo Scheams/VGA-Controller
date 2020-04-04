@@ -22,8 +22,10 @@ package vga_top_pkg is
   -- FREQUENCY
   -- C_F_CLK: System clock frequency
   -- C_F_DB: Button debounce frequency
-  constant C_F_CLK : integer := 100_000_000;
-  constant C_F_DB  : integer := 1_000;
+  -- constant C_F_CLK : integer := 100_000_000;
+  -- constant C_F_DB  : integer := 1_000;
+  constant C_F_CLK : integer := 25_000_000;
+  constant C_F_DB  : integer := 1_000_000;
 
   -- DATA WIDTH
   -- C_N_COLOUR: Colour bit depth
