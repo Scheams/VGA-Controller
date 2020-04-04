@@ -50,9 +50,11 @@ entity ctrl_mem2 is
     -- v_px_i: Vertical pixel information
     -- h_px_i: Horizontal pixel information
     -- rom_data: RGB colour from ROM
+    -- pb_i: Push-button input for moving object
     v_px_i      : in  std_logic_vector (n_px-1 downto 0);
     h_px_i      : in  std_logic_vector (n_px-1 downto 0);
     rom_data_i  : in  std_logic_vector (3*n_colour-1 downto 0);
+    pb_i        : in  std_logic_vector (3 downto 0);
 
     -- OUTPUTS
     -- rom_addr_o: Address to access ROM

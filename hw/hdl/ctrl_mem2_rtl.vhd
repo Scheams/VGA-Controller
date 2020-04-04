@@ -29,6 +29,13 @@ architecture rtl of ctrl_mem2 is
   signal s_cnt_img : unsigned (n_addr-1 downto 0);
   signal s_img     : std_logic;
 
+  signal s_pb_prev : std_logic_vector (pb_i'length-1 downto 0);
+
+  signal s_h_tmp_offset : integer;
+  signal s_v_tmp_offset : integer;
+  signal s_h_offset : integer;
+  signal s_v_offset : integer;
+
 begin
 
   p_rgb: process (s_img, rom_data_i)
@@ -50,10 +57,39 @@ begin
       s_cnt_img <= (others => '0');
       rom_addr_o <= (others => '0');
 
+      s_h_tmp_offset <= 0;
+      s_v_tmp_offset <= 0;
+      s_h_offset <= 0;
+      s_v_offset <= 0;
+
     elsif clk_i'event and (clk_i = '1') then
 
+      if s_pb_prev(0) = '0' and pb_i(0) = '1' then
+        if s_h_tmp_offset < i_h_res - 100 then
+          s_h_tmp_offset <= s_h_tmp_offset + 30;
+        end if;
+      end if;
+
+      if s_pb_prev(1) = '0' and pb_i(1) = '1' then
+        if s_h_tmp_offset >= 30 then
+          s_h_tmp_offset <= s_h_tmp_offset - 30;
+        end if;
+      end if;
+
+      if s_pb_prev(2) = '0' and pb_i(2) = '1' then
+        if s_v_tmp_offset >= 30 then
+          s_v_tmp_offset <= s_v_tmp_offset - 30;
+        end if;
+      end if;
+
+      if s_pb_prev(3) = '0' and pb_i(3) = '1' then
+        if s_v_tmp_offset < i_v_res - 100 then
+          s_v_tmp_offset <= s_v_tmp_offset + 30;
+        end if;
+      end if;
+
       if s_prev_px /= h_px_i then
-        if unsigned(h_px_i) >= 0 and unsigned(h_px_i) < 100+0 and unsigned(v_px_i) >= 0 and unsigned(v_px_i) < 100+0 then
+        if unsigned(h_px_i) >= s_h_offset and unsigned(h_px_i) < 100+s_h_offset and unsigned(v_px_i) >= s_v_offset and unsigned(v_px_i) < 100+s_v_offset then
           s_cnt_img <= s_cnt_img + 1;
           s_img <= '1';
         else
@@ -63,6 +99,9 @@ begin
         if unsigned(v_px_i) = 0 and unsigned(h_px_i) = 0 then
           s_cnt_img <= (others => '0');
           rom_addr_o <= (others => '0');
+
+          s_h_offset <= s_h_tmp_offset;
+          s_v_offset <= s_v_tmp_offset;
         elsif unsigned(s_cnt_img) >= 10000-1 then
           rom_addr_o <= std_logic_vector(to_unsigned(10000-1, rom_addr_o'length));
         else
@@ -71,6 +110,7 @@ begin
       end if;
 
       s_prev_px <= h_px_i;
+      s_pb_prev <= pb_i;
     end if;
   end process p_process;
 

@@ -181,6 +181,7 @@ architecture structural of vga_top is
       v_px_i      : in  std_logic_vector (n_px-1 downto 0);
       h_px_i      : in  std_logic_vector (n_px-1 downto 0);
       rom_data_i  : in  std_logic_vector (3*n_colour-1 downto 0);
+      pb_i        : in  std_logic_vector (3 downto 0);
       rom_addr_o  : out std_logic_vector (n_addr-1 downto 0);
       red_o       : out std_logic_vector (n_colour-1 downto 0);
       green_o     : out std_logic_vector (n_colour-1 downto 0);
@@ -432,6 +433,7 @@ begin
     v_px_i      => s_px_v,
     h_px_i      => s_px_h,
     rom_data_i  => s_rom2_data,
+    pb_i        => s_pb_sync,
     rom_addr_o  => s_rom2_addr,
     red_o       => s_mem2_red,
     green_o     => s_mem2_green,

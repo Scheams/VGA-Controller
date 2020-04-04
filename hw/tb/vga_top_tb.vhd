@@ -122,6 +122,49 @@ begin
   s_rst_i <= '0' after 200 ns;
   s_clk_i <= not s_clk_i after C_T/2;
 
+  p_pb: process
+  begin
+    s_pb_i <= (others => '0');
+    wait for 500 ns;
+
+    loop
+      s_pb_i(0) <= '1';
+      wait for 500 us;
+      s_pb_i(0) <= '0';
+      wait for 500 us;
+    end loop;
+
+    s_pb_i(0) <= '1';
+    wait for 1 ms;
+    s_pb_i(0) <= '0';
+
+    s_pb_i(3) <= '1';
+    wait for 1 ms;
+    s_pb_i(3) <= '0';
+
+    s_pb_i(0) <= '1';
+    wait for 1 ms;
+    s_pb_i(0) <= '0';
+
+    s_pb_i(3) <= '1';
+    wait for 1 ms;
+    s_pb_i(3) <= '0';
+
+    s_pb_i(1) <= '1';
+    wait for 1 ms;
+    s_pb_i(1) <= '0';
+
+    s_pb_i(2) <= '1';
+    wait for 1 ms;
+    s_pb_i(2) <= '0';
+
+    s_pb_i(0) <= '1';
+    wait for 1 ms;
+    s_pb_i(0) <= '0';
+
+    wait;
+  end process p_pb;
+
   ------------------------------------------------------------------------------
   -- Simualtion process
   ------------------------------------------------------------------------------
@@ -129,32 +172,24 @@ begin
   begin
 
     -- Reset all use inputs
-    s_pb_i <= (others => '0');
     s_sw_i <= (others => '0');
 
-    -- Wait for first frame to start
+    -- PATTERN GENERATOR 1
+    -- Wait for first frame start and set source
     wait until s_v_sync_o = '1';
-
-    -- Set source to Pattern Generator 1
     s_sw_i <= (others => '0');
 
-    -- Wait for next frame start
+    -- MEMORY CONTROL 2
     wait until s_v_sync_o = '1';
+    s_sw_i <= (2 => '1', others => '0');
 
-    -- Set source to Pattern Generator 2
+    -- PATTERN GENERATOR 2
+    wait until s_v_sync_o = '1';
     s_sw_i <= (0 => '1', others => '0');
 
-    -- Wait for next frame start
+    -- MEMORY CONTROL 1
     wait until s_v_sync_o = '1';
-
-    -- Set source to Memory Control 1
     s_sw_i <= (1 => '1', others => '0');
-
-    -- Wait for next frame start
-    wait until s_v_sync_o = '1';
-
-    -- Set source to Memory Control 1
-    s_sw_i <= (2 => '1', others => '0');
 
     wait;
 

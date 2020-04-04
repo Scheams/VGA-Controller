@@ -13,8 +13,13 @@ add wave -noupdate /vga_top_tb/s_green_o
 add wave -noupdate /vga_top_tb/s_blue_o
 add wave -noupdate /vga_top_tb/u_dut/u_controller/px_h_o
 add wave -noupdate /vga_top_tb/u_dut/u_controller/px_v_o
+add wave -noupdate /vga_top_tb/u_dut/u_mc2/s_pb_prev
+add wave -noupdate /vga_top_tb/u_dut/u_mc2/s_h_tmp_offset
+add wave -noupdate /vga_top_tb/u_dut/u_mc2/s_v_tmp_offset
+add wave -noupdate /vga_top_tb/u_dut/u_mc2/s_h_offset
+add wave -noupdate /vga_top_tb/u_dut/u_mc2/s_v_offset
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {13930000 ps} 0}
+WaveRestoreCursors {{Cursor 1} {15004000000 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 279
 configure wave -valuecolwidth 100
@@ -30,4 +35,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {0 ps} {91187631 ps}
+WaveRestoreZoom {0 ps} {71742258 ns}
