@@ -30,6 +30,15 @@ architecture structural of vga_top is
   -- COMPONENTS
   ------------------------------------------------------------------------------
 
+  component clk_pll
+    port (
+      reset   : in  std_logic;
+      clk_i   : in  std_logic;
+      clk_o   : out std_logic;
+      locked  : out std_logic
+    );
+  end component clk_pll;
+
   component vga_ctrl
     generic (
       n_colour          : integer;
@@ -129,14 +138,26 @@ architecture structural of vga_top is
     );
   end component pattern_gen2;
 
-  component clk_pll
-    port (
-      reset   : in  std_logic;
-      clk_i   : in  std_logic;
-      clk_o   : out std_logic;
-      locked  : out std_logic
+  component ctrl_mem1
+    generic (
+      n_colour  : integer;
+      n_px      : integer;
+      n_addr    : integer;
+      i_h_res   : integer;
+      i_v_res   : integer
     );
-  end component clk_pll;
+    port (
+      rst_i       : in  std_logic;
+      clk_i       : in  std_logic;
+      v_px_i      : in  std_logic_vector (n_px-1 downto 0);
+      h_px_i      : in  std_logic_vector (n_px-1 downto 0);
+      rom_data_i  : in  std_logic_vector (3*n_colour-1 downto 0);
+      rom_addr_o  : out std_logic_vector (n_addr-1 downto 0);
+      red_o       : out std_logic_vector (n_colour-1 downto 0);
+      green_o     : out std_logic_vector (n_colour-1 downto 0);
+      blue_o      : out std_logic_vector (n_colour-1 downto 0)
+    );
+  end component ctrl_mem1;
 
   ------------------------------------------------------------------------------
   -- SIGNALS
@@ -153,35 +174,39 @@ architecture structural of vga_top is
   signal s_px_h       : std_logic_vector (C_N_PX-1 downto 0);
   signal s_px_v       : std_logic_vector (C_N_PX-1 downto 0);
 
+  -- Internal ROM 1 communication signals
+  signal s_rom1_data  : std_logic_vector (3*C_N_COLOUR-1 downto 0);
+  signal s_rom1_addr  : std_logic_vector (C_N_ADDR1-1 downto 0);
+
   -- Internal RGB channels of Pattern Generator 1
   signal s_pg1_red    : std_logic_vector (C_N_COLOUR-1 downto 0);
   signal s_pg1_green  : std_logic_vector (C_N_COLOUR-1 downto 0);
   signal s_pg1_blue   : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_pg1_rgb    : std_logic_vector (C_N_COLOUR*3-1 downto 0);
+  signal s_pg1_rgb    : std_logic_vector (3*C_N_COLOUR-1 downto 0);
 
   -- Internal RGB channels of Pattern Generator 2
   signal s_pg2_red    : std_logic_vector (C_N_COLOUR-1 downto 0);
   signal s_pg2_green  : std_logic_vector (C_N_COLOUR-1 downto 0);
   signal s_pg2_blue   : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_pg2_rgb    : std_logic_vector (C_N_COLOUR*3-1 downto 0);
+  signal s_pg2_rgb    : std_logic_vector (3*C_N_COLOUR-1 downto 0);
 
   -- Internal RGB channels of Memory Control 1
   signal s_mem1_red    : std_logic_vector (C_N_COLOUR-1 downto 0);
   signal s_mem1_green  : std_logic_vector (C_N_COLOUR-1 downto 0);
   signal s_mem1_blue   : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_mem1_rgb    : std_logic_vector (C_N_COLOUR*3-1 downto 0);
+  signal s_mem1_rgb    : std_logic_vector (3*C_N_COLOUR-1 downto 0);
 
   -- Internal RGB channels of Memory Control 2
   signal s_mem2_red    : std_logic_vector (C_N_COLOUR-1 downto 0);
   signal s_mem2_green  : std_logic_vector (C_N_COLOUR-1 downto 0);
   signal s_mem2_blue   : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_mem2_rgb    : std_logic_vector (C_N_COLOUR*3-1 downto 0);
+  signal s_mem2_rgb    : std_logic_vector (3*C_N_COLOUR-1 downto 0);
 
   -- Internal RGB channels of MUX
   signal s_mux_red    : std_logic_vector (C_N_COLOUR-1 downto 0);
   signal s_mux_green  : std_logic_vector (C_N_COLOUR-1 downto 0);
   signal s_mux_blue   : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_mux_rgb    : std_logic_vector (C_N_COLOUR*3-1 downto 0);
+  signal s_mux_rgb    : std_logic_vector (3*C_N_COLOUR-1 downto 0);
 
 
 begin
@@ -312,6 +337,29 @@ begin
     red_o   => s_pg2_red,
     green_o => s_pg2_green,
     blue_o  => s_pg2_blue
+  );
+
+  ------------------------------------------------------------------------------
+  -- Memory Control 1
+  ------------------------------------------------------------------------------
+  u_mc1: ctrl_mem1
+  generic map (
+    n_colour  => C_N_COLOUR,
+    n_px      => C_N_PX,
+    n_addr    => C_N_ADDR1,
+    i_h_res   => C_H_PX_VISIBLE_AREA,
+    i_v_res   => C_V_LN_VISIBLE_AREA
+  )
+  port map (
+    rst_i       => rst_i,
+    clk_i       => clk_i,
+    v_px_i      => s_px_v,
+    h_px_i      => s_px_h,
+    rom_data_i  => s_rom1_data,
+    rom_addr_o  => s_rom1_addr,
+    red_o       => s_mem1_red,
+    green_o     => s_mem1_green,
+    blue_o      => s_mem1_blue
   );
 
 end architecture structural;

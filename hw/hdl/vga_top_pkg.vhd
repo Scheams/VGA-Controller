@@ -29,8 +29,10 @@ package vga_top_pkg is
   -- C_N_COLOUR: Colour bit depth
   -- C_N_PX: Pixel information data width (2^C_N_PX-1 >= C_H_PX_WHOLE_LINE &
   --         2^C_N_PX-1 >= C_V_LN_WHOLE_LINE)
+  -- C_N_ADDR1: Address bus width for ROM 1
   constant C_N_COLOUR : integer := 4;
   constant C_N_PX     : integer := 10;
+  constant C_N_ADDR1  : integer := 17;
 
   -- HORIZONTAL SPECS
   constant C_H_PX_VISIBLE_AREA  : integer := 640;
