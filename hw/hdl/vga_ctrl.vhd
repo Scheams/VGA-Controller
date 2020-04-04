@@ -17,6 +17,7 @@
 -- Revisions :
 -- Date         Version  Author           Description
 -- 30.03.2020   v1.0.0   Christoph Amon   Initial stage
+-- 04.04.2020   v1.1.0   Christoph Amon   Add enable signal
 --------------------------------------------------------------------------------
 
 library ieee;
@@ -60,8 +61,10 @@ entity vga_ctrl is
     -- SYSTEM
     -- rst_i: System reset
     -- clk_i: System clock
+    -- enable_i: VGA Controller enable
     rst_i    : in  std_logic;
     clk_i    : in  std_logic;
+    enable_i : in  std_logic;
 
     -- INPUTS
     -- red_i: Red colour input

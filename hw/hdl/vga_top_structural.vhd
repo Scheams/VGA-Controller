@@ -49,6 +49,7 @@ architecture structural of vga_top is
     port (
       rst_i    : in  std_logic;
       clk_i    : in  std_logic;
+      enable_i : in  std_logic;
       red_i    : in  std_logic_vector (n_colour-1 downto 0);
       green_i  : in  std_logic_vector (n_colour-1 downto 0);
       blue_i   : in  std_logic_vector (n_colour-1 downto 0);
@@ -128,9 +129,21 @@ architecture structural of vga_top is
     );
   end component pattern_gen2;
 
+  component clk_pll
+    port (
+      reset   : in  std_logic;
+      clk_i   : in  std_logic;
+      clk_o   : out std_logic;
+      locked  : out std_logic
+    );
+  end component clk_pll;
+
   ------------------------------------------------------------------------------
   -- SIGNALS
   ------------------------------------------------------------------------------
+
+  signal s_vga_clk    : std_logic;
+  signal s_locked     : std_logic;
 
   -- Internal debounced push-buttons and switches
   signal s_pb_sync    : std_logic_vector (3 downto 0);
@@ -183,6 +196,17 @@ begin
   (s_mux_blue,  s_mux_green,  s_mux_red ) <= s_mux_rgb;
 
   ------------------------------------------------------------------------------
+  -- VGA PLL
+  ------------------------------------------------------------------------------
+  dut: clk_pll
+  port map (
+    reset   => rst_i,
+    clk_i   => clk_i,
+    clk_o   => s_vga_clk,
+    locked  => s_locked
+  );
+
+  ------------------------------------------------------------------------------
   -- VGA Controller
   ------------------------------------------------------------------------------
   u_controller: vga_ctrl
@@ -202,7 +226,8 @@ begin
   )
   port map (
     rst_i    => rst_i,
-    clk_i    => clk_i,
+    clk_i    => s_vga_clk,
+    enable_i => s_locked,
     red_i    => s_mux_red,
     green_i  => s_mux_green,
     blue_i   => s_mux_blue,

@@ -29,6 +29,8 @@ end vga_top_tb;
 
 architecture sim of vga_top_tb is
 
+  constant C_T : time := 1_000_000_000 ns / C_F_CLK;
+
   ------------------------------------------------------------------------------
   -- COMPONENTS
   ------------------------------------------------------------------------------
@@ -118,7 +120,7 @@ begin
 
   -- Generate reset pulse and clock signal
   s_rst_i <= '0' after 200 ns;
-  s_clk_i <= not s_clk_i after 20 ns;
+  s_clk_i <= not s_clk_i after C_T/2;
 
   ------------------------------------------------------------------------------
   -- Simualtion process
@@ -141,6 +143,12 @@ begin
 
     -- Set source to Pattern Generator 2
     s_sw_i <= (0 => '1', others => '0');
+
+    -- Wait for next frame start
+    wait until s_v_sync_o = '1';
+
+    -- Set source to Memory Control 1
+    s_sw_i <= (1 => '1', others => '0');
 
     wait;
 

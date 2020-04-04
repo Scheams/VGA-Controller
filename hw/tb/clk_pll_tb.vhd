@@ -9,7 +9,8 @@
 -- Platform :   ModelSim - Starter Edition 10.5b, Vivado 2019.2
 -- Language:    VHDL 1076-2008
 --------------------------------------------------------------------------------
--- Description: The "Clk PLL" Unit
+-- Description: The "Clk PLL" Unit produces a clock that is required for the
+--              VGA Controller.
 --------------------------------------------------------------------------------
 -- Revisions :
 -- Date         Version  Author           Description

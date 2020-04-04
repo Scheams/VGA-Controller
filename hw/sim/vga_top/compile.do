@@ -2,6 +2,10 @@
 vcom ../../hdl/vga_ctrl_pkg.vhd
 vcom ../../hdl/vga_top_pkg.vhd
 
+vlog ../../generate/clk_pll/clk_pll_clk_wiz.v
+vlog ../../generate/clk_pll/clk_pll.v
+vlog ../../generate/ip_user_files/sim_scripts/clk_pll/modelsim/glbl.v
+
 vcom ../../hdl/vga_ctrl.vhd
 vcom ../../hdl/vga_ctrl_rtl.vhd
 vcom ../../hdl/vga_ctrl_cfg.vhd

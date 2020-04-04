@@ -17,6 +17,7 @@
 -- Revisions :
 -- Date         Version  Author           Description
 -- 30.03.2020   v1.0.0   Christoph Amon   Initial stage
+-- 04.04.2020   v1.1.0   Christoph Amon   Add enable signal
 --------------------------------------------------------------------------------
 
 library ieee;
@@ -94,9 +95,10 @@ architecture sim of vga_ctrl_tb is
     port (
       rst_i    : in  std_logic;
       clk_i    : in  std_logic;
-      red_i    : in std_logic_vector (n_colour-1 downto 0);
-      green_i  : in std_logic_vector (n_colour-1 downto 0);
-      blue_i   : in std_logic_vector (n_colour-1 downto 0);
+      enable_i : in  std_logic;
+      red_i    : in  std_logic_vector (n_colour-1 downto 0);
+      green_i  : in  std_logic_vector (n_colour-1 downto 0);
+      blue_i   : in  std_logic_vector (n_colour-1 downto 0);
 
       h_sync_o : out std_logic;
       v_sync_o : out std_logic;
@@ -167,6 +169,7 @@ begin
   port map (
     rst_i    => s_rst_i,
     clk_i    => s_clk_i,
+    enable_i => '1',
     red_i    => s_red_i,
     green_i  => s_green_i,
     blue_i   => s_blue_i,

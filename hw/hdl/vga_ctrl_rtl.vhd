@@ -17,6 +17,7 @@
 -- Revisions :
 -- Date         Version  Author           Description
 -- 30.03.2020   v1.0.0   Christoph Amon   Initial stage
+-- 04.04.2020   v1.1.0   Christoph Amon   Add enable signal
 --------------------------------------------------------------------------------
 
 library ieee;
@@ -69,81 +70,95 @@ begin
 
     elsif clk_i'event and (clk_i = '1') then
 
-      -- Increase counter every clock cycle
-      v_h_counter := v_h_counter + 1;
+      -- Only process if controller is enabled
+      if enable_i = '1' then
 
-      -- Go through all horizontal stages according to sepcs
-      case s_h_state is
+        -- Increase counter every clock cycle
+        v_h_counter := v_h_counter + 1;
 
-        when S_SYNC =>
-          if v_h_counter = h_px_sync_pulse then
-            s_h_state <= S_BACKPORCH;
-            v_h_counter := (others => '0');
-          end if;
+        -- Go through all horizontal stages according to sepcs
+        case s_h_state is
 
-        when S_BACKPORCH =>
-          if v_h_counter = h_px_back_porch then
-            s_h_state <= S_DATA;
-            v_h_counter := (others => '0');
-          end if;
+          when S_SYNC =>
+            if v_h_counter = h_px_sync_pulse then
+              s_h_state <= S_BACKPORCH;
+              v_h_counter := (others => '0');
+            end if;
 
-        when S_DATA =>
-          if v_h_counter = h_px_visible_area then
-            s_h_state <= S_FRONTPORCH;
-            v_h_counter := (others => '0');
-          end if;
+          when S_BACKPORCH =>
+            if v_h_counter = h_px_back_porch then
+              s_h_state <= S_DATA;
+              v_h_counter := (others => '0');
+            end if;
 
-        when S_FRONTPORCH =>
-          if v_h_counter = h_px_front_porch then
+          when S_DATA =>
+            if v_h_counter = h_px_visible_area then
+              s_h_state <= S_FRONTPORCH;
+              v_h_counter := (others => '0');
+            end if;
+
+          when S_FRONTPORCH =>
+            if v_h_counter = h_px_front_porch then
+              s_h_state <= S_SYNC;
+              v_h_counter := (others => '0');
+              -- Increase vertical counter
+              v_v_counter := v_v_counter + 1;
+            end if;
+
+          when others =>
             s_h_state <= S_SYNC;
             v_h_counter := (others => '0');
-            -- Increase vertical counter
-            v_v_counter := v_v_counter + 1;
-          end if;
 
-        when others =>
-          s_h_state <= S_SYNC;
-          v_h_counter := (others => '0');
+        end case;
 
-      end case;
+        -- Go through all vertical stages according to specs
+        case s_v_state is
 
-      -- Go through all vertical stages according to specs
-      case s_v_state is
+          when S_SYNC =>
+            if v_v_counter = v_ln_sync_pulse then
+              s_v_state <= S_BACKPORCH;
+              v_v_counter := (others => '0');
+            end if;
 
-        when S_SYNC =>
-          if v_v_counter = v_ln_sync_pulse then
-            s_v_state <= S_BACKPORCH;
-            v_v_counter := (others => '0');
-          end if;
+          when S_BACKPORCH =>
+            if v_v_counter = v_ln_back_porch then
+              s_v_state <= S_DATA;
+              v_v_counter := (others => '0');
+            end if;
 
-        when S_BACKPORCH =>
-          if v_v_counter = v_ln_back_porch then
-            s_v_state <= S_DATA;
-            v_v_counter := (others => '0');
-          end if;
+          when S_DATA =>
+            if v_v_counter = v_ln_visible_area then
+              s_v_state <= S_FRONTPORCH;
+              v_v_counter := (others => '0');
+            end if;
 
-        when S_DATA =>
-          if v_v_counter = v_ln_visible_area then
-            s_v_state <= S_FRONTPORCH;
-            v_v_counter := (others => '0');
-          end if;
+          when S_FRONTPORCH =>
+            if v_v_counter = v_ln_front_porch then
+              s_v_state <= S_SYNC;
+              v_v_counter := (others => '0');
+            end if;
 
-        when S_FRONTPORCH =>
-          if v_v_counter = v_ln_front_porch then
+          when others =>
             s_v_state <= S_SYNC;
             v_v_counter := (others => '0');
-          end if;
 
-        when others =>
-          s_v_state <= S_SYNC;
-          v_v_counter := (others => '0');
+        end case;
 
-      end case;
+        -- Assign process variables to architecture signals
+        s_v_counter <= v_v_counter;
+        s_h_counter <= v_h_counter;
 
-      -- Assign process variables to architecture signals
-      s_v_counter <= v_v_counter;
-      s_h_counter <= v_h_counter;
+      else
+        -- Reset values if controller not enabled
+        s_h_state <= S_IDLE;
+        s_v_state <= S_IDLE;
 
+        s_v_counter <= (others => '0');
+        s_h_counter <= (others => '0');
+
+        v_v_counter := (others => '0');
+        v_h_counter := (others => '0');
+      end if;
     end if;
 
   end process p_horizontal;
