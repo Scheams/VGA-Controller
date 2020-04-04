@@ -1,4 +1,5 @@
-vcom ../../hdl/vga_top_pkg.vhd
+vcom ../../hdl/vga_specs_pkg.vhd
+vcom ../../tb/vga_sim_pkg.vhd
 
 vcom ../../hdl/io_debounce.vhd
 vcom ../../hdl/io_debounce_rtl.vhd

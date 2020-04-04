@@ -25,6 +25,9 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+library work;
+use work.vga_sim_pkg.all;
+
 entity io_debounce_tb is
 end entity io_debounce_tb;
 
@@ -34,16 +37,11 @@ architecture sim of io_debounce_tb is
   -- CONSTANTS
   ------------------------------------------------------------------------------
 
-  -- C_F_SYS: Simulation system frequency
-  -- C_F_DB: Simulation debounce frequency (higher frequency than in real)
-  -- C_N_SW: Number of switches (use 2 for simulation)
-  -- C_N_PB: Number of push-buttons (use 2 for simulation)
-  -- C_T: Time of one period
-  constant C_F_SYS  : integer := 25_000_000;
-  constant C_F_DB   : integer := 5_000_000;
   constant C_N_SW   : integer := 2;
   constant C_N_PB   : integer := 2;
-  constant C_T      : time    := 1 sec / C_F_SYS;
+
+  constant C_SW_ZEROS : std_logic_vector (C_N_SW-1 downto 0) := (others => '0');
+  constant C_PB_ZEROS : std_logic_vector (C_N_PB-1 downto 0) := (others => '0');
 
   ------------------------------------------------------------------------------
   -- COMPONENTS
@@ -80,13 +78,17 @@ architecture sim of io_debounce_tb is
 
 begin
 
+  -- Create reset pulse and clock signal
+  s_rst_i <= '0' after T_RST;
+  s_clk_i <= not s_clk_i after T_OSC / 2;
+
   ------------------------------------------------------------------------------
   -- Device under test
   ------------------------------------------------------------------------------
   u_dut: io_debounce
   generic map (
-    f_sys       => C_F_SYS,
-    f_debounce  => C_F_DB,
+    f_sys       => F_OSC,
+    f_debounce  => F_DB,
     n_sw        => C_N_SW,
     n_pb        => C_N_PB
   )
@@ -95,22 +97,20 @@ begin
     rst_i => s_rst_i,
     sw_i  => s_sw_i,
     pb_i  => s_pb_i,
-
     sw_sync_o => s_sw_sync_o,
     pb_sync_o => s_pb_sync_o
   );
-
-  -- Create reset pulse and clock signal
-  s_rst_i <= '0' after C_T/2;
-  s_clk_i <= not s_clk_i after C_T/2;
 
   ------------------------------------------------------------------------------
   -- Simulate push buttons
   ------------------------------------------------------------------------------
   p_pb: process
   begin
-    s_pb_i(0) <= '1' after C_T;
-    s_pb_i(1) <= '1' after 3 * C_T;
+    wait for T_RST;
+
+    s_pb_i(0) <= '1' after T_DB / 5, '0' after T_DB * 3;
+    s_pb_i(1) <= '1' after T_DB * 4 / 3;
+
     wait;
   end process p_pb;
 
@@ -119,8 +119,13 @@ begin
   ------------------------------------------------------------------------------
   p_sw: process
   begin
-    s_sw_i(0) <= '1' after C_T, '0' after 5*C_T, '1' after 10*C_T;
-    s_sw_i(1) <= '1', '0' after 10*C_T, '1' after 15*C_T, '0' after 20*C_T;
+    wait for T_RST;
+
+    s_sw_i(0) <= '1' after T_DB / 5, '0' after T_DB * 3 / 5,
+                 '1' after T_DB * 3 / 2;
+    s_sw_i(1) <= '1', '0' after T_DB * 4 / 5, '1' after T_DB * 7 / 5,
+                 '0' after T_DB * 2;
+
     wait;
   end process p_sw;
 
@@ -129,25 +134,27 @@ begin
   ------------------------------------------------------------------------------
   p_check: process
   begin
-    wait for 6*C_T;
-    assert (s_pb_sync_o = "00") and (s_sw_sync_o = "00")
+    wait for T_RST + 5 * T_DB / 5;
+
+    wait for T_DB;
+    assert s_sw_sync_o(0) = '0' and s_sw_sync_o(1) = '0' and
+           s_pb_sync_o(0) = '0' and s_pb_sync_o(1) = '0'
       report "Stage 1 failed debounce!" severity error;
 
-    wait for 2*C_T;
-    assert (s_pb_sync_o = "01") and (s_sw_sync_o = "10")
+    wait for T_DB;
+    assert s_sw_sync_o(0) = '0' and s_sw_sync_o(1) = '0' and
+           s_pb_sync_o(0) = '1' and s_pb_sync_o(1) = '0'
       report "Stage 2 failed debounce!" severity error;
 
-    wait for 5*C_T;
-    assert (s_pb_sync_o = "11") and (s_sw_sync_o = "10")
+    wait for T_DB;
+    assert s_sw_sync_o(0) = '1' and s_sw_sync_o(1) = '0' and
+           s_pb_sync_o(0) = '1' and s_pb_sync_o(1) = '1'
       report "Stage 3 failed debounce!" severity error;
 
-    wait for 5*C_T;
-    assert (s_pb_sync_o = "11") and (s_sw_sync_o = "11")
+    wait for T_DB;
+    assert s_sw_sync_o(0) = '1' and s_sw_sync_o(1) = '0' and
+            s_pb_sync_o(0) = '0' and s_pb_sync_o(1) = '1'
       report "Stage 4 failed debounce!" severity error;
-
-    wait for 10*C_T;
-    assert (s_pb_sync_o = "11") and (s_sw_sync_o = "01")
-      report "Stage 5 failed debounce!" severity error;
 
     wait;
   end process p_check;

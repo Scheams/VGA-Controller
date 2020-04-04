@@ -27,10 +27,12 @@ package vga_sim_pkg is
 
   constant F_OSC    : natural := 100_000_000;
   constant F_VGA    : natural :=  25_000_000;
+  constant F_DB     : natural :=   1_000_000;
 
   constant T_RST    : time    := 200 ns;
 
   constant T_OSC    : time    := 1 sec / F_OSC;
   constant T_VGA    : time    := 1 sec / F_VGA;
+  constant T_DB     : time    := 1 sec / F_DB;
 
 end package vga_sim_pkg;
