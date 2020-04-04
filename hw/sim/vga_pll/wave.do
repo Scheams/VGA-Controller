@@ -1,9 +1,9 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
-add wave -noupdate /clk_pll_tb/s_reset
-add wave -noupdate /clk_pll_tb/s_clk_i
-add wave -noupdate /clk_pll_tb/s_clk_o
-add wave -noupdate /clk_pll_tb/s_locked
+add wave -noupdate /vga_pll_tb/s_reset
+add wave -noupdate /vga_pll_tb/s_clk_i
+add wave -noupdate /vga_pll_tb/s_clk_o
+add wave -noupdate /vga_pll_tb/s_locked_o
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {2543605 ps} 0}
 quietly wave cursor active 1

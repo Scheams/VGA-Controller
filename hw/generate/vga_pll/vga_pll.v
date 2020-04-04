@@ -1,5 +1,5 @@
 
-// file: clk_pll.v
+// file: vga_pll.v
 // 
 // (c) Copyright 2008 - 2013 Xilinx, Inc. All rights reserved.
 // 
@@ -65,26 +65,26 @@
 
 `timescale 1ps/1ps
 
-(* CORE_GENERATION_INFO = "clk_pll,clk_wiz_v6_0_4_0_0,{component_name=clk_pll,use_phase_alignment=true,use_min_o_jitter=false,use_max_i_jitter=false,use_dyn_phase_shift=false,use_inclk_switchover=false,use_dyn_reconfig=false,enable_axi=0,feedback_source=FDBK_AUTO,PRIMITIVE=PLL,num_out_clk=1,clkin1_period=10.000,clkin2_period=10.000,use_power_down=false,use_reset=true,use_locked=true,use_inclk_stopped=false,feedback_type=SINGLE,CLOCK_MGR_TYPE=NA,manual_override=false}" *)
+(* CORE_GENERATION_INFO = "vga_pll,clk_wiz_v6_0_4_0_0,{component_name=vga_pll,use_phase_alignment=true,use_min_o_jitter=false,use_max_i_jitter=false,use_dyn_phase_shift=false,use_inclk_switchover=false,use_dyn_reconfig=false,enable_axi=0,feedback_source=FDBK_AUTO,PRIMITIVE=PLL,num_out_clk=1,clkin1_period=10.000,clkin2_period=10.000,use_power_down=false,use_reset=true,use_locked=true,use_inclk_stopped=false,feedback_type=SINGLE,CLOCK_MGR_TYPE=NA,manual_override=false}" *)
 
-module clk_pll 
+module vga_pll 
  (
   // Clock out ports
   output        clk_o,
   // Status and control signals
   input         reset,
-  output        locked,
+  output        locked_o,
  // Clock in ports
   input         clk_i
  );
 
-  clk_pll_clk_wiz inst
+  vga_pll_clk_wiz inst
   (
   // Clock out ports  
   .clk_o(clk_o),
   // Status and control signals               
   .reset(reset), 
-  .locked(locked),
+  .locked_o(locked_o),
  // Clock in ports
   .clk_i(clk_i)
   );

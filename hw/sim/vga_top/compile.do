@@ -4,14 +4,14 @@ file copy -force ../../generate/ip_user_files/mem_init_files/rom_mem2.mif ./
 vcom ../../hdl/vga_ctrl_pkg.vhd
 vcom ../../hdl/vga_top_pkg.vhd
 
-vlog ../../generate/clk_pll/clk_pll_clk_wiz.v
-vlog ../../generate/clk_pll/clk_pll.v
+vlog ../../generate/vga_pll/vga_pll_clk_wiz.v
+vlog ../../generate/vga_pll/vga_pll.v
 
 vlog ../../generate/rom_mem1/simulation/blk_mem_gen_v8_4.v
 vlog ../../generate/rom_mem1/sim/rom_mem1.v
 vlog ../../generate/rom_mem2/sim/rom_mem2.v
 
-vlog ../../generate/ip_user_files/sim_scripts/clk_pll/modelsim/glbl.v
+vlog ../../generate/ip_user_files/sim_scripts/vga_pll/modelsim/glbl.v
 
 vcom ../../hdl/vga_ctrl.vhd
 vcom ../../hdl/vga_ctrl_rtl.vhd

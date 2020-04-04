@@ -65,14 +65,14 @@
 
 -- The following code must appear in the VHDL architecture header:
 ------------- Begin Cut here for COMPONENT Declaration ------ COMP_TAG
-component clk_pll
+component vga_pll
 port
  (-- Clock in ports
   -- Clock out ports
   clk_o          : out    std_logic;
   -- Status and control signals
   reset             : in     std_logic;
-  locked            : out    std_logic;
+  locked_o            : out    std_logic;
   clk_i           : in     std_logic
  );
 end component;
@@ -81,13 +81,13 @@ end component;
 -- The following code must appear in the VHDL architecture
 -- body. Substitute your own instance name and net names.
 ------------- Begin Cut here for INSTANTIATION Template ----- INST_TAG
-your_instance_name : clk_pll
+your_instance_name : vga_pll
    port map ( 
   -- Clock out ports  
    clk_o => clk_o,
   -- Status and control signals                
    reset => reset,
-   locked => locked,
+   locked_o => locked_o,
    -- Clock in ports
    clk_i => clk_i
  );

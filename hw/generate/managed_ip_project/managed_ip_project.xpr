@@ -40,13 +40,13 @@
     <Option Name="WTVcsLaunchSim" Val="0"/>
     <Option Name="WTRivieraLaunchSim" Val="0"/>
     <Option Name="WTActivehdlLaunchSim" Val="0"/>
-    <Option Name="WTXSimExportSim" Val="6"/>
-    <Option Name="WTModelSimExportSim" Val="9"/>
-    <Option Name="WTQuestaExportSim" Val="6"/>
-    <Option Name="WTIesExportSim" Val="6"/>
-    <Option Name="WTVcsExportSim" Val="6"/>
-    <Option Name="WTRivieraExportSim" Val="6"/>
-    <Option Name="WTActivehdlExportSim" Val="6"/>
+    <Option Name="WTXSimExportSim" Val="7"/>
+    <Option Name="WTModelSimExportSim" Val="10"/>
+    <Option Name="WTQuestaExportSim" Val="7"/>
+    <Option Name="WTIesExportSim" Val="7"/>
+    <Option Name="WTVcsExportSim" Val="7"/>
+    <Option Name="WTRivieraExportSim" Val="7"/>
+    <Option Name="WTActivehdlExportSim" Val="7"/>
     <Option Name="GenerateIPUpgradeLog" Val="TRUE"/>
     <Option Name="XSimRadix" Val="hex"/>
     <Option Name="XSimTimeUnit" Val="ns"/>
@@ -115,19 +115,6 @@
         <Option Name="UseBlackboxStub" Val="1"/>
       </Config>
     </FileSet>
-    <FileSet Name="clk_pll" Type="BlockSrcs" RelSrcDir="$PSRCDIR/clk_pll">
-      <File Path="$PPRDIR/../clk_pll/clk_pll.xci">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <Config>
-        <Option Name="TopModule" Val="clk_pll"/>
-        <Option Name="UseBlackboxStub" Val="1"/>
-      </Config>
-    </FileSet>
     <FileSet Name="rom_mem2" Type="BlockSrcs" RelSrcDir="$PSRCDIR/rom_mem2">
       <File Path="$PPRDIR/../rom_mem2/rom_mem2.xci">
         <FileInfo>
@@ -138,6 +125,19 @@
       </File>
       <Config>
         <Option Name="TopModule" Val="rom_mem2"/>
+        <Option Name="UseBlackboxStub" Val="1"/>
+      </Config>
+    </FileSet>
+    <FileSet Name="vga_pll" Type="BlockSrcs" RelSrcDir="$PSRCDIR/vga_pll">
+      <File Path="$PPRDIR/../vga_pll/vga_pll.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <Config>
+        <Option Name="TopModule" Val="vga_pll"/>
         <Option Name="UseBlackboxStub" Val="1"/>
       </Config>
     </FileSet>
@@ -180,7 +180,7 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>
-    <Run Id="clk_pll_synth_1" Type="Ft3:Synth" SrcSet="clk_pll" Part="xc7a35tcpg236-1" ConstrsSet="clk_pll" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/clk_pll_synth_1" IncludeInArchive="true">
+    <Run Id="rom_mem2_synth_1" Type="Ft3:Synth" SrcSet="rom_mem2" Part="xc7a35tcpg236-1" ConstrsSet="rom_mem2" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/rom_mem2_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2019"/>
         <Step Id="synth_design"/>
@@ -190,9 +190,11 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>
-    <Run Id="rom_mem2_synth_1" Type="Ft3:Synth" SrcSet="rom_mem2" Part="xc7a35tcpg236-1" ConstrsSet="rom_mem2" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/rom_mem2_synth_1" IncludeInArchive="true">
+    <Run Id="vga_pll_synth_1" Type="Ft3:Synth" SrcSet="vga_pll" Part="xc7a35tcpg236-1" ConstrsSet="vga_pll" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/vga_pll_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2019"/>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2019">
+          <Desc>Vivado Synthesis Defaults</Desc>
+        </StratHandle>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
@@ -234,7 +236,7 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>
-    <Run Id="clk_pll_impl_1" Type="Ft2:EntireDesign" Part="xc7a35tcpg236-1" ConstrsSet="clk_pll" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="clk_pll_synth_1" IncludeInArchive="false" GenFullBitstream="true">
+    <Run Id="rom_mem2_impl_1" Type="Ft2:EntireDesign" Part="xc7a35tcpg236-1" ConstrsSet="rom_mem2" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="rom_mem2_synth_1" IncludeInArchive="false" GenFullBitstream="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2019"/>
         <Step Id="init_design"/>
@@ -251,9 +253,11 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>
-    <Run Id="rom_mem2_impl_1" Type="Ft2:EntireDesign" Part="xc7a35tcpg236-1" ConstrsSet="rom_mem2" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="rom_mem2_synth_1" IncludeInArchive="false" GenFullBitstream="true">
+    <Run Id="vga_pll_impl_1" Type="Ft2:EntireDesign" Part="xc7a35tcpg236-1" ConstrsSet="vga_pll" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="vga_pll_synth_1" IncludeInArchive="false" GenFullBitstream="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2019"/>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2019">
+          <Desc>Default settings for Implementation.</Desc>
+        </StratHandle>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>

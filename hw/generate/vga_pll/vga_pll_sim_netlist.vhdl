@@ -1,11 +1,11 @@
 -- Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2019.2 (win64) Build 2708876 Wed Nov  6 21:40:23 MST 2019
--- Date        : Sat Apr  4 10:02:07 2020
+-- Date        : Sat Apr  4 12:46:44 2020
 -- Host        : chris-surface running 64-bit major release  (build 9200)
 -- Command     : write_vhdl -force -mode funcsim
---               C:/technikum/chd/vga_controller/hw/generate/clk_pll/clk_pll_sim_netlist.vhdl
--- Design      : clk_pll
+--               c:/technikum/chd/vga_controller/hw/generate/vga_pll/vga_pll_sim_netlist.vhdl
+-- Design      : vga_pll
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
 -- Device      : xc7a35tcpg236-1
@@ -14,22 +14,22 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
-entity clk_pll_clk_pll_clk_wiz is
+entity vga_pll_vga_pll_clk_wiz is
   port (
     clk_o : out STD_LOGIC;
     reset : in STD_LOGIC;
-    locked : out STD_LOGIC;
+    locked_o : out STD_LOGIC;
     clk_i : in STD_LOGIC
   );
   attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of clk_pll_clk_pll_clk_wiz : entity is "clk_pll_clk_wiz";
-end clk_pll_clk_pll_clk_wiz;
+  attribute ORIG_REF_NAME of vga_pll_vga_pll_clk_wiz : entity is "vga_pll_clk_wiz";
+end vga_pll_vga_pll_clk_wiz;
 
-architecture STRUCTURE of clk_pll_clk_pll_clk_wiz is
-  signal clk_i_clk_pll : STD_LOGIC;
-  signal clk_o_clk_pll : STD_LOGIC;
-  signal clkfbout_buf_clk_pll : STD_LOGIC;
-  signal clkfbout_clk_pll : STD_LOGIC;
+architecture STRUCTURE of vga_pll_vga_pll_clk_wiz is
+  signal clk_i_vga_pll : STD_LOGIC;
+  signal clk_o_vga_pll : STD_LOGIC;
+  signal clkfbout_buf_vga_pll : STD_LOGIC;
+  signal clkfbout_vga_pll : STD_LOGIC;
   signal NLW_plle2_adv_inst_CLKOUT1_UNCONNECTED : STD_LOGIC;
   signal NLW_plle2_adv_inst_CLKOUT2_UNCONNECTED : STD_LOGIC;
   signal NLW_plle2_adv_inst_CLKOUT3_UNCONNECTED : STD_LOGIC;
@@ -51,8 +51,8 @@ architecture STRUCTURE of clk_pll_clk_pll_clk_wiz is
 begin
 clkf_buf: unisim.vcomponents.BUFG
      port map (
-      I => clkfbout_clk_pll,
-      O => clkfbout_buf_clk_pll
+      I => clkfbout_vga_pll,
+      O => clkfbout_buf_vga_pll
     );
 clkin1_ibufg: unisim.vcomponents.IBUF
     generic map(
@@ -60,11 +60,11 @@ clkin1_ibufg: unisim.vcomponents.IBUF
     )
         port map (
       I => clk_i,
-      O => clk_i_clk_pll
+      O => clk_i_vga_pll
     );
 clkout1_buf: unisim.vcomponents.BUFG
      port map (
-      I => clk_o_clk_pll,
+      I => clk_o_vga_pll,
       O => clk_o
     );
 plle2_adv_inst: unisim.vcomponents.PLLE2_ADV
@@ -102,12 +102,12 @@ plle2_adv_inst: unisim.vcomponents.PLLE2_ADV
       STARTUP_WAIT => "FALSE"
     )
         port map (
-      CLKFBIN => clkfbout_buf_clk_pll,
-      CLKFBOUT => clkfbout_clk_pll,
-      CLKIN1 => clk_i_clk_pll,
+      CLKFBIN => clkfbout_buf_vga_pll,
+      CLKFBOUT => clkfbout_vga_pll,
+      CLKIN1 => clk_i_vga_pll,
       CLKIN2 => '0',
       CLKINSEL => '1',
-      CLKOUT0 => clk_o_clk_pll,
+      CLKOUT0 => clk_o_vga_pll,
       CLKOUT1 => NLW_plle2_adv_inst_CLKOUT1_UNCONNECTED,
       CLKOUT2 => NLW_plle2_adv_inst_CLKOUT2_UNCONNECTED,
       CLKOUT3 => NLW_plle2_adv_inst_CLKOUT3_UNCONNECTED,
@@ -120,7 +120,7 @@ plle2_adv_inst: unisim.vcomponents.PLLE2_ADV
       DO(15 downto 0) => NLW_plle2_adv_inst_DO_UNCONNECTED(15 downto 0),
       DRDY => NLW_plle2_adv_inst_DRDY_UNCONNECTED,
       DWE => '0',
-      LOCKED => locked,
+      LOCKED => locked_o,
       PWRDWN => '0',
       RST => reset
     );
@@ -129,24 +129,24 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
-entity clk_pll is
+entity vga_pll is
   port (
     clk_o : out STD_LOGIC;
     reset : in STD_LOGIC;
-    locked : out STD_LOGIC;
+    locked_o : out STD_LOGIC;
     clk_i : in STD_LOGIC
   );
   attribute NotValidForBitStream : boolean;
-  attribute NotValidForBitStream of clk_pll : entity is true;
-end clk_pll;
+  attribute NotValidForBitStream of vga_pll : entity is true;
+end vga_pll;
 
-architecture STRUCTURE of clk_pll is
+architecture STRUCTURE of vga_pll is
 begin
-inst: entity work.clk_pll_clk_pll_clk_wiz
+inst: entity work.vga_pll_vga_pll_clk_wiz
      port map (
       clk_i => clk_i,
       clk_o => clk_o,
-      locked => locked,
+      locked_o => locked_o,
       reset => reset
     );
 end STRUCTURE;

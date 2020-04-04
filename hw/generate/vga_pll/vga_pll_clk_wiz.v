@@ -1,5 +1,5 @@
 
-// file: clk_pll.v
+// file: vga_pll.v
 // 
 // (c) Copyright 2008 - 2013 Xilinx, Inc. All rights reserved.
 // 
@@ -65,22 +65,22 @@
 
 `timescale 1ps/1ps
 
-module clk_pll_clk_wiz 
+module vga_pll_clk_wiz 
 
  (// Clock in ports
   // Clock out ports
   output        clk_o,
   // Status and control signals
   input         reset,
-  output        locked,
+  output        locked_o,
   input         clk_i
  );
   // Input buffering
   //------------------------------------
-wire clk_i_clk_pll;
-wire clk_in2_clk_pll;
+wire clk_i_vga_pll;
+wire clk_in2_vga_pll;
   IBUF clkin1_ibufg
-   (.O (clk_i_clk_pll),
+   (.O (clk_i_vga_pll),
     .I (clk_i));
 
 
@@ -93,20 +93,20 @@ wire clk_in2_clk_pll;
   //    * Unused inputs are tied off
   //    * Unused outputs are labeled unused
 
-  wire        clk_o_clk_pll;
-  wire        clk_out2_clk_pll;
-  wire        clk_out3_clk_pll;
-  wire        clk_out4_clk_pll;
-  wire        clk_out5_clk_pll;
-  wire        clk_out6_clk_pll;
-  wire        clk_out7_clk_pll;
+  wire        clk_o_vga_pll;
+  wire        clk_out2_vga_pll;
+  wire        clk_out3_vga_pll;
+  wire        clk_out4_vga_pll;
+  wire        clk_out5_vga_pll;
+  wire        clk_out6_vga_pll;
+  wire        clk_out7_vga_pll;
 
   wire [15:0] do_unused;
   wire        drdy_unused;
   wire        psdone_unused;
-  wire        locked_int;
-  wire        clkfbout_clk_pll;
-  wire        clkfbout_buf_clk_pll;
+  wire        locked_o_int;
+  wire        clkfbout_vga_pll;
+  wire        clkfbout_buf_vga_pll;
   wire        clkfboutb_unused;
    wire clkout1_unused;
    wire clkout2_unused;
@@ -132,16 +132,16 @@ wire clk_in2_clk_pll;
   plle2_adv_inst
     // Output clocks
    (
-    .CLKFBOUT            (clkfbout_clk_pll),
-    .CLKOUT0             (clk_o_clk_pll),
+    .CLKFBOUT            (clkfbout_vga_pll),
+    .CLKOUT0             (clk_o_vga_pll),
     .CLKOUT1             (clkout1_unused),
     .CLKOUT2             (clkout2_unused),
     .CLKOUT3             (clkout3_unused),
     .CLKOUT4             (clkout4_unused),
     .CLKOUT5             (clkout5_unused),
      // Input clock control
-    .CLKFBIN             (clkfbout_buf_clk_pll),
-    .CLKIN1              (clk_i_clk_pll),
+    .CLKFBIN             (clkfbout_buf_vga_pll),
+    .CLKIN1              (clk_i_vga_pll),
     .CLKIN2              (1'b0),
      // Tied to always select the primary input clock
     .CLKINSEL            (1'b1),
@@ -154,20 +154,20 @@ wire clk_in2_clk_pll;
     .DRDY                (drdy_unused),
     .DWE                 (1'b0),
     // Other control and status signals
-    .LOCKED              (locked_int),
+    .LOCKED              (locked_o_int),
     .PWRDWN              (1'b0),
     .RST                 (reset_high));
   assign reset_high = reset; 
 
-  assign locked = locked_int;
+  assign locked_o = locked_o_int;
 // Clock Monitor clock assigning
 //--------------------------------------
  // Output buffering
   //-----------------------------------
 
   BUFG clkf_buf
-   (.O (clkfbout_buf_clk_pll),
-    .I (clkfbout_clk_pll));
+   (.O (clkfbout_buf_vga_pll),
+    .I (clkfbout_vga_pll));
 
 
 
@@ -176,7 +176,7 @@ wire clk_in2_clk_pll;
 
   BUFG clkout1_buf
    (.O   (clk_o),
-    .I   (clk_o_clk_pll));
+    .I   (clk_o_vga_pll));
 
 
 

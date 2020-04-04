@@ -1,11 +1,11 @@
 // Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
 // Tool Version: Vivado v.2019.2 (win64) Build 2708876 Wed Nov  6 21:40:23 MST 2019
-// Date        : Sat Apr  4 10:02:07 2020
+// Date        : Sat Apr  4 12:46:44 2020
 // Host        : chris-surface running 64-bit major release  (build 9200)
 // Command     : write_verilog -force -mode funcsim
-//               C:/technikum/chd/vga_controller/hw/generate/clk_pll/clk_pll_sim_netlist.v
-// Design      : clk_pll
+//               c:/technikum/chd/vga_controller/hw/generate/vga_pll/vga_pll_sim_netlist.v
+// Design      : vga_pll
 // Purpose     : This verilog netlist is a functional simulation representation of the design and should not be modified
 //               or synthesized. This netlist cannot be used for SDF annotated simulation.
 // Device      : xc7a35tcpg236-1
@@ -13,46 +13,46 @@
 `timescale 1 ps / 1 ps
 
 (* NotValidForBitStream *)
-module clk_pll
+module vga_pll
    (clk_o,
     reset,
-    locked,
+    locked_o,
     clk_i);
   output clk_o;
   input reset;
-  output locked;
+  output locked_o;
   input clk_i;
 
   (* IBUF_LOW_PWR *) wire clk_i;
   wire clk_o;
-  wire locked;
+  wire locked_o;
   wire reset;
 
-  clk_pll_clk_pll_clk_wiz inst
+  vga_pll_vga_pll_clk_wiz inst
        (.clk_i(clk_i),
         .clk_o(clk_o),
-        .locked(locked),
+        .locked_o(locked_o),
         .reset(reset));
 endmodule
 
-(* ORIG_REF_NAME = "clk_pll_clk_wiz" *) 
-module clk_pll_clk_pll_clk_wiz
+(* ORIG_REF_NAME = "vga_pll_clk_wiz" *) 
+module vga_pll_vga_pll_clk_wiz
    (clk_o,
     reset,
-    locked,
+    locked_o,
     clk_i);
   output clk_o;
   input reset;
-  output locked;
+  output locked_o;
   input clk_i;
 
   wire clk_i;
-  wire clk_i_clk_pll;
+  wire clk_i_vga_pll;
   wire clk_o;
-  wire clk_o_clk_pll;
-  wire clkfbout_buf_clk_pll;
-  wire clkfbout_clk_pll;
-  wire locked;
+  wire clk_o_vga_pll;
+  wire clkfbout_buf_vga_pll;
+  wire clkfbout_vga_pll;
+  wire locked_o;
   wire reset;
   wire NLW_plle2_adv_inst_CLKOUT1_UNCONNECTED;
   wire NLW_plle2_adv_inst_CLKOUT2_UNCONNECTED;
@@ -64,8 +64,8 @@ module clk_pll_clk_pll_clk_wiz
 
   (* BOX_TYPE = "PRIMITIVE" *) 
   BUFG clkf_buf
-       (.I(clkfbout_clk_pll),
-        .O(clkfbout_buf_clk_pll));
+       (.I(clkfbout_vga_pll),
+        .O(clkfbout_buf_vga_pll));
   (* BOX_TYPE = "PRIMITIVE" *) 
   (* CAPACITANCE = "DONT_CARE" *) 
   (* IBUF_DELAY_VALUE = "0" *) 
@@ -74,10 +74,10 @@ module clk_pll_clk_pll_clk_wiz
     .IOSTANDARD("DEFAULT")) 
     clkin1_ibufg
        (.I(clk_i),
-        .O(clk_i_clk_pll));
+        .O(clk_i_vga_pll));
   (* BOX_TYPE = "PRIMITIVE" *) 
   BUFG clkout1_buf
-       (.I(clk_o_clk_pll),
+       (.I(clk_o_vga_pll),
         .O(clk_o));
   (* BOX_TYPE = "PRIMITIVE" *) 
   PLLE2_ADV #(
@@ -113,12 +113,12 @@ module clk_pll_clk_pll_clk_wiz
     .REF_JITTER2(0.010000),
     .STARTUP_WAIT("FALSE")) 
     plle2_adv_inst
-       (.CLKFBIN(clkfbout_buf_clk_pll),
-        .CLKFBOUT(clkfbout_clk_pll),
-        .CLKIN1(clk_i_clk_pll),
+       (.CLKFBIN(clkfbout_buf_vga_pll),
+        .CLKFBOUT(clkfbout_vga_pll),
+        .CLKIN1(clk_i_vga_pll),
         .CLKIN2(1'b0),
         .CLKINSEL(1'b1),
-        .CLKOUT0(clk_o_clk_pll),
+        .CLKOUT0(clk_o_vga_pll),
         .CLKOUT1(NLW_plle2_adv_inst_CLKOUT1_UNCONNECTED),
         .CLKOUT2(NLW_plle2_adv_inst_CLKOUT2_UNCONNECTED),
         .CLKOUT3(NLW_plle2_adv_inst_CLKOUT3_UNCONNECTED),
@@ -131,7 +131,7 @@ module clk_pll_clk_pll_clk_wiz
         .DO(NLW_plle2_adv_inst_DO_UNCONNECTED[15:0]),
         .DRDY(NLW_plle2_adv_inst_DRDY_UNCONNECTED),
         .DWE(1'b0),
-        .LOCKED(locked),
+        .LOCKED(locked_o),
         .PWRDWN(1'b0),
         .RST(reset));
 endmodule

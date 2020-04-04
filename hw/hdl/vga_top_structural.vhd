@@ -30,14 +30,14 @@ architecture structural of vga_top is
   -- COMPONENTS
   ------------------------------------------------------------------------------
 
-  component clk_pll
+  component vga_pll
     port (
-      reset   : in  std_logic;
-      clk_i   : in  std_logic;
-      clk_o   : out std_logic;
-      locked  : out std_logic
+      reset     : in  std_logic;
+      clk_i     : in  std_logic;
+      clk_o     : out std_logic;
+      locked_o  : out std_logic
     );
-  end component clk_pll;
+  end component vga_pll;
 
   component vga_ctrl
     generic (
@@ -264,12 +264,12 @@ begin
   ------------------------------------------------------------------------------
   -- VGA PLL
   ------------------------------------------------------------------------------
-  -- dut: clk_pll
+  -- dut: vga_pll
   -- port map (
-  --   reset   => rst_i,
-  --   clk_i   => clk_i,
-  --   clk_o   => s_vga_clk,
-  --   locked  => s_locked
+  --   reset    => rst_i,
+  --   clk_i    => clk_i,
+  --   clk_o    => s_vga_clk,
+  --   locked_o => s_locked
   -- );
   s_vga_clk <= clk_i;
   s_locked <= '1';
