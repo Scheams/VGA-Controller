@@ -1,10 +1,10 @@
 // Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
 // Tool Version: Vivado v.2019.2 (win64) Build 2708876 Wed Nov  6 21:40:23 MST 2019
-// Date        : Thu Apr  2 16:05:03 2020
+// Date        : Sat Apr  4 10:02:07 2020
 // Host        : chris-surface running 64-bit major release  (build 9200)
-// Command     : write_verilog -force -mode funcsim -rename_top clk_pll -prefix
-//               clk_pll_ clk_pll_sim_netlist.v
+// Command     : write_verilog -force -mode funcsim
+//               C:/technikum/chd/vga_controller/hw/generate/clk_pll/clk_pll_sim_netlist.v
 // Design      : clk_pll
 // Purpose     : This verilog netlist is a functional simulation representation of the design and should not be modified
 //               or synthesized. This netlist cannot be used for SDF annotated simulation.
@@ -35,6 +35,7 @@ module clk_pll
         .reset(reset));
 endmodule
 
+(* ORIG_REF_NAME = "clk_pll_clk_wiz" *) 
 module clk_pll_clk_pll_clk_wiz
    (clk_o,
     reset,
@@ -81,11 +82,11 @@ module clk_pll_clk_pll_clk_wiz
   (* BOX_TYPE = "PRIMITIVE" *) 
   PLLE2_ADV #(
     .BANDWIDTH("OPTIMIZED"),
-    .CLKFBOUT_MULT(37),
+    .CLKFBOUT_MULT(33),
     .CLKFBOUT_PHASE(0.000000),
     .CLKIN1_PERIOD(10.000000),
     .CLKIN2_PERIOD(0.000000),
-    .CLKOUT0_DIVIDE(49),
+    .CLKOUT0_DIVIDE(33),
     .CLKOUT0_DUTY_CYCLE(0.500000),
     .CLKOUT0_PHASE(0.000000),
     .CLKOUT1_DIVIDE(1),
@@ -104,7 +105,7 @@ module clk_pll_clk_pll_clk_wiz
     .CLKOUT5_DUTY_CYCLE(0.500000),
     .CLKOUT5_PHASE(0.000000),
     .COMPENSATION("ZHOLD"),
-    .DIVCLK_DIVIDE(3),
+    .DIVCLK_DIVIDE(4),
     .IS_CLKINSEL_INVERTED(1'b0),
     .IS_PWRDWN_INVERTED(1'b0),
     .IS_RST_INVERTED(1'b0),
