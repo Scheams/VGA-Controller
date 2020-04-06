@@ -5,9 +5,9 @@
 -- File :       source_mux_tb.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 02.04.2020
+-- Last update: 06.04.2020
 -- Platform :   ModelSim - Starter Edition 10.5b
--- Language:    VHDL 1076-2008
+-- Language:    VHDL 1076-2002
 --------------------------------------------------------------------------------
 -- Description: The "Source MUX" unit maps different source input to the VGA
 --              controller unit. Depending on the position of 3 input switches
@@ -22,17 +22,30 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+library work;
+use work.vga_specs_pkg.all;
+use work.vga_sim_pkg.all;
+
 entity source_mux_tb is
 end source_mux_tb;
 
 architecture sim of source_mux_tb is
 
   ------------------------------------------------------------------------------
-  -- CONSTANTS
+  -- FUNCTIONS
   ------------------------------------------------------------------------------
 
-  -- C_N_COLOUR: Colour bit depth used
-  constant C_N_COLOUR : integer := 4;
+  -- https://stackoverflow.com/a/38850022
+  function to_string ( a: std_logic_vector) return string is
+    variable b : string (1 to a'length) := (others => NUL);
+    variable stri : integer := 1;
+    begin
+        for i in a'range loop
+            b(stri) := std_logic'image(a((i)))(2);
+        stri := stri+1;
+        end loop;
+    return b;
+    end function;
 
   ------------------------------------------------------------------------------
   -- COMPONENTS
@@ -40,15 +53,15 @@ architecture sim of source_mux_tb is
 
   component source_mux
     generic (
-      n_colour : integer
+      g_colour  : t_colour
     );
     port (
       sw_sync_i   : in  std_logic_vector (2 downto 0);
-      rgb_pg1_i   : in  std_logic_vector (3*n_colour-1 downto 0);
-      rgb_pg2_i   : in  std_logic_vector (3*n_colour-1 downto 0);
-      rgb_mem1_i  : in  std_logic_vector (3*n_colour-1 downto 0);
-      rgb_mem2_i  : in  std_logic_vector (3*n_colour-1 downto 0);
-      rgb_vga_o   : out std_logic_vector (3*n_colour-1 downto 0)
+      rgb_pg1_i   : in  std_logic_vector (g_colour.n_bus-1 downto 0);
+      rgb_pg2_i   : in  std_logic_vector (g_colour.n_bus-1 downto 0);
+      rgb_mem1_i  : in  std_logic_vector (g_colour.n_bus-1 downto 0);
+      rgb_mem2_i  : in  std_logic_vector (g_colour.n_bus-1 downto 0);
+      rgb_vga_o   : out std_logic_vector (g_colour.n_bus-1 downto 0)
     );
   end component source_mux;
 
@@ -58,11 +71,11 @@ architecture sim of source_mux_tb is
 
   -- In- and Output signals
   signal s_sw_sync_i   : std_logic_vector (2 downto 0);
-  signal s_rgb_pg1_i   : std_logic_vector (3*C_N_COLOUR-1 downto 0);
-  signal s_rgb_pg2_i   : std_logic_vector (3*C_N_COLOUR-1 downto 0);
-  signal s_rgb_mem1_i  : std_logic_vector (3*C_N_COLOUR-1 downto 0);
-  signal s_rgb_mem2_i  : std_logic_vector (3*C_N_COLOUR-1 downto 0);
-  signal s_rgb_vga_o   : std_logic_vector (3*C_N_COLOUR-1 downto 0);
+  signal s_rgb_pg1_i   : std_logic_vector (COLOUR.n_bus-1 downto 0);
+  signal s_rgb_pg2_i   : std_logic_vector (COLOUR.n_bus-1 downto 0);
+  signal s_rgb_mem1_i  : std_logic_vector (COLOUR.n_bus-1 downto 0);
+  signal s_rgb_mem2_i  : std_logic_vector (COLOUR.n_bus-1 downto 0);
+  signal s_rgb_vga_o   : std_logic_vector (COLOUR.n_bus-1 downto 0);
 
 begin
 
@@ -71,7 +84,7 @@ begin
   ------------------------------------------------------------------------------
   u_dut: source_mux
   generic map (
-    n_colour => C_N_COLOUR
+    g_colour => COLOUR
   )
   port map (
     sw_sync_i   => s_sw_sync_i,
@@ -88,9 +101,12 @@ begin
   p_sim: process
   begin
 
-    s_rgb_pg1_i <= (0 => '1', others => '0');
-    s_rgb_pg2_i <= (1 => '1', others => '0');
-    s_rgb_mem1_i <= (2 => '1', others => '0');
+    s_rgb_pg1_i <= (others => '0');
+    s_rgb_pg1_i(0) <= '1';
+    s_rgb_pg2_i <= (others => '0');
+    s_rgb_pg2_i(1) <= '1';
+    s_rgb_mem1_i <= (others => '0');
+    s_rgb_mem1_i(2) <= '1';
     s_rgb_mem2_i <= (others => '1');
 
     -- Check Pattern Gen 1

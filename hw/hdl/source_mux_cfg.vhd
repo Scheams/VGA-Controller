@@ -5,9 +5,9 @@
 -- File :       source_mux_cfg.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 01.04.2020
+-- Last update: 06.04.2020
 -- Platform :   ModelSim - Starter Edition 10.5b
--- Language:    VHDL 1076-2008
+-- Language:    VHDL 1076-2002
 --------------------------------------------------------------------------------
 -- Description: The "Source MUX" unit maps different source input to the VGA
 --              controller unit. Depending on the position of 3 input switches

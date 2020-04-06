@@ -5,9 +5,9 @@
 -- File :       source_mux_rtl.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 02.04.2020
+-- Last update: 06.04.2020
 -- Platform :   ModelSim - Starter Edition 10.5b
--- Language:    VHDL 1076-2008
+-- Language:    VHDL 1076-2002
 --------------------------------------------------------------------------------
 -- Description: The "Source MUX" unit maps different source input to the VGA
 --              controller unit. Depending on the position of 3 input switches
@@ -21,6 +21,9 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
+library work;
+use work.vga_specs_pkg.all;
 
 architecture rtl of source_mux is
 
