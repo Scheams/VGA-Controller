@@ -5,9 +5,9 @@
 -- File :       vga_ctrl_cfg.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 02.04.2020
+-- Last update: 06.04.2020
 -- Platform :   ModelSim - Starter Edition 10.5b
--- Language:    VHDL 1076-2008
+-- Language:    VHDL 1076-2002
 --------------------------------------------------------------------------------
 -- Description: The "VGA Control" unit controlls the hardware operation that
 --              is transfered through the VGA cable to the monitor. It takes

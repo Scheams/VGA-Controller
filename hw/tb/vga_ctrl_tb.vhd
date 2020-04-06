@@ -5,9 +5,9 @@
 -- File :       vga_ctrl_tb.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 02.04.2020
+-- Last update: 06.04.2020
 -- Platform :   ModelSim - Starter Edition 10.5b
--- Language:    VHDL 1076-2008
+-- Language:    VHDL 1076-2002
 --------------------------------------------------------------------------------
 -- Description: The "VGA Control" unit controlls the hardware operation that
 --              is transfered through the VGA cable to the monitor. It takes
@@ -26,6 +26,8 @@ use ieee.numeric_std.all;
 
 library work;
 use work.vga_ctrl_pkg.all;
+use work.vga_specs_pkg.all;
+use work.vga_sim_pkg.all;
 
 entity vga_ctrl_tb is
 end vga_ctrl_tb;
@@ -77,36 +79,24 @@ architecture sim of vga_ctrl_tb is
 
   component vga_ctrl
     generic (
-      n_colour : integer;
-      n_px     : integer;
-
-      h_px_visible_area : integer;
-      h_px_front_porch  : integer;
-      h_px_sync_pulse   : integer;
-      h_px_back_porch   : integer;
-      h_px_whole_line   : integer;
-
-      v_ln_visible_area : integer;
-      v_ln_front_porch  : integer;
-      v_ln_sync_pulse   : integer;
-      v_ln_back_porch   : integer;
-      v_ln_whole_frame  : integer
+      g_specs   : t_vga_specs;
+      g_colour  : t_colour
     );
     port (
       rst_i    : in  std_logic;
       clk_i    : in  std_logic;
       enable_i : in  std_logic;
-      red_i    : in  std_logic_vector (n_colour-1 downto 0);
-      green_i  : in  std_logic_vector (n_colour-1 downto 0);
-      blue_i   : in  std_logic_vector (n_colour-1 downto 0);
+      red_i    : in  std_logic_vector (g_colour.n_rgb-1 downto 0);
+      green_i  : in  std_logic_vector (g_colour.n_rgb-1 downto 0);
+      blue_i   : in  std_logic_vector (g_colour.n_rgb-1 downto 0);
 
       h_sync_o : out std_logic;
       v_sync_o : out std_logic;
-      red_o    : out std_logic_vector (n_colour-1 downto 0);
-      green_o  : out std_logic_vector (n_colour-1 downto 0);
-      blue_o   : out std_logic_vector (n_colour-1 downto 0);
-      px_h_o   : out std_logic_vector (n_px-1 downto 0);
-      px_v_o   : out std_logic_vector (n_px-1 downto 0)
+      red_o    : out std_logic_vector (g_colour.n_rgb-1 downto 0);
+      green_o  : out std_logic_vector (g_colour.n_rgb-1 downto 0);
+      blue_o   : out std_logic_vector (g_colour.n_rgb-1 downto 0);
+      px_h_o   : out std_logic_vector (g_specs.addr.n_h-1 downto 0);
+      px_v_o   : out std_logic_vector (g_specs.addr.n_v-1 downto 0)
     );
   end component vga_ctrl;
 
@@ -117,32 +107,26 @@ architecture sim of vga_ctrl_tb is
   -- In- and Output signals
   signal s_rst_i      : std_logic := '1';
   signal s_clk_i      : std_logic := '1';
-  signal s_red_i      : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_green_i    : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_blue_i     : std_logic_vector (C_N_COLOUR-1 downto 0);
+  signal s_red_i      : std_logic_vector (COLOUR.n_rgb-1 downto 0);
+  signal s_green_i    : std_logic_vector (COLOUR.n_rgb-1 downto 0);
+  signal s_blue_i     : std_logic_vector (COLOUR.n_rgb-1 downto 0);
   signal s_h_sync_o   : std_logic;
   signal s_v_sync_o   : std_logic;
-  signal s_red_o      : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_green_o    : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_blue_o     : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_px_h_o     : std_logic_vector (C_N_PX-1 downto 0);
-  signal s_px_v_o     : std_logic_vector (C_N_PX-1 downto 0);
+  signal s_red_o      : std_logic_vector (COLOUR.n_rgb-1 downto 0);
+  signal s_green_o    : std_logic_vector (COLOUR.n_rgb-1 downto 0);
+  signal s_blue_o     : std_logic_vector (COLOUR.n_rgb-1 downto 0);
+  signal s_px_h_o     : std_logic_vector (SPECS.addr.n_h-1 downto 0);
+  signal s_px_v_o     : std_logic_vector (SPECS.addr.n_v-1 downto 0);
 
   -- s_h_stamp: Timestamp for horizontal timing checks
   -- s_h_delta: Time difference for horizontal timing checks
-  -- s_h_state: Horizontal state of DUT access via alias
   signal s_h_stamp : time := 0 ns;
   signal s_h_delta : time;
-  alias s_h_state : t_state
-    is << signal .vga_ctrl_tb.u_dut.s_h_state : t_state >>;
 
   -- s_v_stamp: Timestamp for vertical timing checks
   -- s_v_delta: Time difference for vertical timing checks
-  -- s_v_state: Vertical state of DUT access via alias
   signal s_v_stamp : time := 0 ns;
   signal s_v_delta : time;
-  alias s_v_state : t_state
-    is << signal .vga_ctrl_tb.u_dut.s_v_state : t_state >>;
 
 begin
 
@@ -151,20 +135,8 @@ begin
   ------------------------------------------------------------------------------
   u_dut: vga_ctrl
   generic map (
-    n_colour => C_N_COLOUR,
-    n_px     => C_N_PX,
-
-    h_px_visible_area => C_H_PX_VISIBLE_AREA,
-    h_px_front_porch  => C_H_PX_FRONT_PORCH,
-    h_px_sync_pulse   => C_H_PX_SYNC_PULSE,
-    h_px_back_porch   => C_H_PX_BACK_PORCH,
-    h_px_whole_line   => C_H_PX_WHOLE_LINE,
-
-    v_ln_visible_area => C_V_LN_VISIBLE_AREA,
-    v_ln_front_porch  => C_V_LN_FRONT_PORCH,
-    v_ln_sync_pulse   => C_V_LN_SYNC_PULSE,
-    v_ln_back_porch   => C_V_LN_BACK_PORCH,
-    v_ln_whole_frame  => C_V_LN_WHOLE_FRAME
+    g_specs   => SPECS,
+    g_colour  => COLOUR
   )
   port map (
     rst_i    => s_rst_i,
@@ -183,8 +155,8 @@ begin
   );
 
   -- Create reset pulse and clock signal
-  s_rst_i <= '0' after C_T/2;
-  s_clk_i <= not s_clk_i after C_T/2;
+  s_rst_i <= '0' after T_RST;
+  s_clk_i <= not s_clk_i after T_VGA / 2;
 
   -- Create black frame
   s_green_i <= (others => '1');
@@ -195,6 +167,8 @@ begin
   -- Check horizontal timing
   ------------------------------------------------------------------------------
   p_h_timing: process
+    alias s_h_state : t_state
+      is << signal .vga_ctrl_tb.u_dut.s_h_state : t_state >>;
   begin
 
     -- Wait for S_SYNC state
@@ -263,6 +237,8 @@ begin
   -- Check vertical timing
   ------------------------------------------------------------------------------
   p_v_timing: process
+    alias s_v_state : t_state
+      is << signal .vga_ctrl_tb.u_dut.s_v_state : t_state >>;
   begin
 
     -- Wait for S_SYNC state

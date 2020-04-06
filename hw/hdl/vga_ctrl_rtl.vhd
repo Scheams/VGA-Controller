@@ -5,7 +5,7 @@
 -- File :       vga_ctrl_rtl.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 02.04.2020
+-- Last update: 06.04.2020
 -- Platform :   ModelSim - Starter Edition 10.5b
 -- Language:    VHDL 1076-2008
 --------------------------------------------------------------------------------
@@ -26,6 +26,7 @@ use ieee.numeric_std.all;
 
 library work;
 use work.vga_ctrl_pkg.all;
+use work.vga_specs_pkg.all;
 
 architecture rtl of vga_ctrl is
 
@@ -35,8 +36,8 @@ architecture rtl of vga_ctrl is
 
   -- s_v_counter: Counter for vertical timing
   -- s_h_counter: Counter for horizontal timing
-  signal s_v_counter : unsigned (n_px-1 downto 0);
-  signal s_h_counter : unsigned (n_px-1 downto 0);
+  signal s_v_counter : unsigned (g_specs.addr.n_v-1 downto 0);
+  signal s_h_counter : unsigned (g_specs.addr.n_h-1 downto 0);
 
   -- s_h_state: State for each line
   -- s_v_state: State for each frame
@@ -52,8 +53,8 @@ begin
   p_horizontal: process (rst_i, clk_i)
     -- v_v_counter: Vertical counter which gets assigned to outer signal
     -- v_h_counter: Horizontal counter which gets assigned to outer signal
-    variable v_v_counter : unsigned (n_px-1 downto 0);
-    variable v_h_counter : unsigned (n_px-1 downto 0);
+    variable v_v_counter : unsigned (g_specs.addr.n_v-1 downto 0);
+    variable v_h_counter : unsigned (g_specs.addr.n_h-1 downto 0);
   begin
 
     -- Reset internal states
@@ -80,25 +81,25 @@ begin
         case s_h_state is
 
           when S_SYNC =>
-            if v_h_counter = h_px_sync_pulse then
+            if v_h_counter = g_specs.px_h.sync_pulse then
               s_h_state <= S_BACKPORCH;
               v_h_counter := (others => '0');
             end if;
 
           when S_BACKPORCH =>
-            if v_h_counter = h_px_back_porch then
+            if v_h_counter = g_specs.px_h.back_porch then
               s_h_state <= S_DATA;
               v_h_counter := (others => '0');
             end if;
 
           when S_DATA =>
-            if v_h_counter = h_px_visible_area then
+            if v_h_counter = g_specs.px_h.visible_area then
               s_h_state <= S_FRONTPORCH;
               v_h_counter := (others => '0');
             end if;
 
           when S_FRONTPORCH =>
-            if v_h_counter = h_px_front_porch then
+            if v_h_counter = g_specs.px_h.front_porch then
               s_h_state <= S_SYNC;
               v_h_counter := (others => '0');
               -- Increase vertical counter
@@ -115,25 +116,25 @@ begin
         case s_v_state is
 
           when S_SYNC =>
-            if v_v_counter = v_ln_sync_pulse then
+            if v_v_counter = g_specs.ln_v.sync_pulse then
               s_v_state <= S_BACKPORCH;
               v_v_counter := (others => '0');
             end if;
 
           when S_BACKPORCH =>
-            if v_v_counter = v_ln_back_porch then
+            if v_v_counter = g_specs.ln_v.back_porch then
               s_v_state <= S_DATA;
               v_v_counter := (others => '0');
             end if;
 
           when S_DATA =>
-            if v_v_counter = v_ln_visible_area then
+            if v_v_counter = g_specs.ln_v.visible_area then
               s_v_state <= S_FRONTPORCH;
               v_v_counter := (others => '0');
             end if;
 
           when S_FRONTPORCH =>
-            if v_v_counter = v_ln_front_porch then
+            if v_v_counter = g_specs.ln_v.front_porch then
               s_v_state <= S_SYNC;
               v_v_counter := (others => '0');
             end if;
