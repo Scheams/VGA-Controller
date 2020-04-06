@@ -5,9 +5,9 @@
 -- File :       rom_mem2_tb.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 04.04.2020
+-- Last update: 06.04.2020
 -- Platform :   ModelSim - Starter Edition 10.5b, Vivado 2019.2
--- Language:    VHDL 1076-2008
+-- Language:    VHDL 1076-2002
 --------------------------------------------------------------------------------
 -- Description: The "ROM Mem 2" Unit
 --------------------------------------------------------------------------------
@@ -19,6 +19,10 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
+library work;
+use work.vga_specs_pkg.all;
+use work.vga_sim_pkg.all;
 
 entity rom_mem2_tb is
 end entity rom_mem2_tb;
@@ -34,8 +38,8 @@ architecture sim of rom_mem2_tb is
   end component rom_mem2;
 
   signal s_clka  : std_logic := '1';
-  signal s_addra : std_logic_vector (13 downto 0) := (others => '0');
-  signal s_douta : std_logic_vector (11 downto 0);
+  signal s_addra : std_logic_vector (IMG2.n_rom-1 downto 0) := (others => '0');
+  signal s_douta : std_logic_vector (COLOUR.n_bus-1 downto 0);
 
 begin
 
@@ -46,16 +50,16 @@ begin
     douta => s_douta
   );
 
-  s_clka <= not s_clka after 5 ns;
+  s_clka <= not s_clka after T_OSC / 2;
 
   p_sim: process
   begin
 
-    for i in 0 to 10000-1 loop
+    for i in 0 to IMG2.size_rom-1 loop
 
       s_addra <= std_logic_vector(to_unsigned(i, s_addra'length));
 
-      wait for 40 ns;
+      wait for T_VGA;
     end loop;
 
     wait;
