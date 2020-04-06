@@ -94,8 +94,8 @@ package vga_specs_pkg is
   );
 
   constant VGA_320x240_IMG : t_image := (
-    height    => 320,
-    width     => 240,
+    height    => 240,
+    width     => 320,
     n_rom     => 17,
     size_rom  => 76800
   );
@@ -157,9 +157,9 @@ package body vga_specs_pkg is
       signal   s_blue   : in  std_logic_vector
     ) is
   begin
-    s_bus (c_n_rgb-1 downto 0) <= s_red;
-    s_bus (c_n_rgb-1 downto 0) <= s_green;
-    s_bus (c_n_rgb-1 downto 0) <= s_blue;
+    s_bus (  c_n_rgb-1 downto         0) <= s_blue;
+    s_bus (2*c_n_rgb-1 downto   c_n_rgb) <= s_green;
+    s_bus (3*c_n_rgb-1 downto 2*c_n_rgb) <= s_red;
   end procedure p_rgb_to_bus;
 
   procedure p_bus_to_rgb (
@@ -170,9 +170,9 @@ package body vga_specs_pkg is
       signal   s_blue   : out std_logic_vector
     ) is
   begin
-    s_red   <= s_bus (c_n_rgb-1 downto 0);
-    s_green <= s_bus (c_n_rgb-1 downto 0);
-    s_blue  <= s_bus (c_n_rgb-1 downto 0);
+    s_blue  <= s_bus (  c_n_rgb-1 downto         0);
+    s_green <= s_bus (2*c_n_rgb-1 downto   c_n_rgb);
+    s_red   <= s_bus (3*c_n_rgb-1 downto 2*c_n_rgb);
   end procedure p_bus_to_rgb;
 
 end package body vga_specs_pkg;

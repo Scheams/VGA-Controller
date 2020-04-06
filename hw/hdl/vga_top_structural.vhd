@@ -5,9 +5,9 @@
 -- File :       vga_top_structural.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 02.04.2020
+-- Last update: 06.04.2020
 -- Platform :   ModelSim - Starter Edition 10.5b
--- Language:    VHDL 1076-2008
+-- Language:    VHDL 1076-2002
 --------------------------------------------------------------------------------
 -- Description: The "VGA Top" unit combines all elements together to one
 --              VGA controller with implemented image generators.
@@ -22,7 +22,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 library work;
-use work.vga_top_pkg.all;
+use work.vga_specs_pkg.all;
 
 architecture structural of vga_top is
 
@@ -30,7 +30,7 @@ architecture structural of vga_top is
   -- COMPONENTS
   ------------------------------------------------------------------------------
 
-  component vga_pll
+  component vga_pll is
     port (
       reset     : in  std_logic;
       clk_i     : in  std_logic;
@@ -39,40 +39,29 @@ architecture structural of vga_top is
     );
   end component vga_pll;
 
-  component vga_ctrl
+  component vga_ctrl is
     generic (
-      n_colour          : integer;
-      n_px              : integer;
-      h_px_visible_area : integer;
-      h_px_front_porch  : integer;
-      h_px_sync_pulse   : integer;
-      h_px_back_porch   : integer;
-      h_px_whole_line   : integer;
-      v_ln_visible_area : integer;
-      v_ln_front_porch  : integer;
-      v_ln_sync_pulse   : integer;
-      v_ln_back_porch   : integer;
-      v_ln_whole_frame  : integer
+      g_specs   : t_vga_specs;
+      g_colour  : t_colour
     );
-
     port (
       rst_i    : in  std_logic;
       clk_i    : in  std_logic;
       enable_i : in  std_logic;
-      red_i    : in  std_logic_vector (n_colour-1 downto 0);
-      green_i  : in  std_logic_vector (n_colour-1 downto 0);
-      blue_i   : in  std_logic_vector (n_colour-1 downto 0);
+      red_i    : in  std_logic_vector (g_colour.n_rgb-1 downto 0);
+      green_i  : in  std_logic_vector (g_colour.n_rgb-1 downto 0);
+      blue_i   : in  std_logic_vector (g_colour.n_rgb-1 downto 0);
       h_sync_o : out std_logic;
       v_sync_o : out std_logic;
-      red_o    : out std_logic_vector (n_colour-1 downto 0);
-      green_o  : out std_logic_vector (n_colour-1 downto 0);
-      blue_o   : out std_logic_vector (n_colour-1 downto 0);
-      px_h_o   : out std_logic_vector (n_px-1 downto 0);
-      px_v_o   : out std_logic_vector (n_px-1 downto 0)
+      red_o    : out std_logic_vector (g_colour.n_rgb-1 downto 0);
+      green_o  : out std_logic_vector (g_colour.n_rgb-1 downto 0);
+      blue_o   : out std_logic_vector (g_colour.n_rgb-1 downto 0);
+      px_h_o   : out std_logic_vector (g_specs.addr.n_h-1 downto 0);
+      px_v_o   : out std_logic_vector (g_specs.addr.n_v-1 downto 0)
     );
   end component vga_ctrl;
 
-  component io_debounce
+  component io_debounce is
     generic (
       f_sys      : integer := 100_000_000;
       f_debounce : integer := 1_000;
@@ -89,73 +78,68 @@ architecture structural of vga_top is
     );
   end component io_debounce;
 
-  component source_mux
+  component source_mux is
     generic (
-      n_colour : integer
+      g_colour  : t_colour
     );
     port (
       sw_sync_i   : in  std_logic_vector (2 downto 0);
-      rgb_pg1_i   : in  std_logic_vector (3*n_colour-1 downto 0);
-      rgb_pg2_i   : in  std_logic_vector (3*n_colour-1 downto 0);
-      rgb_mem1_i  : in  std_logic_vector (3*n_colour-1 downto 0);
-      rgb_mem2_i  : in  std_logic_vector (3*n_colour-1 downto 0);
-      rgb_vga_o   : out std_logic_vector (3*n_colour-1 downto 0)
+      rgb_pg1_i   : in  std_logic_vector (g_colour.n_bus-1 downto 0);
+      rgb_pg2_i   : in  std_logic_vector (g_colour.n_bus-1 downto 0);
+      rgb_mem1_i  : in  std_logic_vector (g_colour.n_bus-1 downto 0);
+      rgb_mem2_i  : in  std_logic_vector (g_colour.n_bus-1 downto 0);
+      rgb_vga_o   : out std_logic_vector (g_colour.n_bus-1 downto 0)
     );
   end component source_mux;
 
-  component pattern_gen1
+  component pattern_gen1 is
     generic (
-      n_colour  : integer;
-      n_px      : integer;
-      i_h_res   : integer
+      g_specs   : t_vga_specs;
+      g_colour  : t_colour
     );
     port (
       rst_i   : in  std_logic;
       clk_i   : in  std_logic;
-      v_px_i  : in  std_logic_vector (n_px-1 downto 0);
-      h_px_i  : in  std_logic_vector (n_px-1 downto 0);
-      red_o   : out std_logic_vector (n_colour-1 downto 0);
-      green_o : out std_logic_vector (n_colour-1 downto 0);
-      blue_o  : out std_logic_vector (n_colour-1 downto 0)
+      v_px_i  : in  std_logic_vector (g_specs.addr.n_v-1 downto 0);
+      h_px_i  : in  std_logic_vector (g_specs.addr.n_h-1 downto 0);
+      red_o   : out std_logic_vector (g_colour.n_rgb-1 downto 0);
+      green_o : out std_logic_vector (g_colour.n_rgb-1 downto 0);
+      blue_o  : out std_logic_vector (g_colour.n_rgb-1 downto 0)
     );
   end component pattern_gen1;
 
-  component pattern_gen2
-  generic (
-    n_colour  : integer;
-    n_px      : integer;
-    i_h_res   : integer;
-    i_v_res   : integer
-  );
+  component pattern_gen2 is
+    generic (
+      g_specs   : t_vga_specs;
+      g_colour  : t_colour
+    );
     port (
-      clk_i   : in  std_logic;
       rst_i   : in  std_logic;
-      v_px_i  : in  std_logic_vector (9 downto 0);
-      h_px_i  : in  std_logic_vector (9 downto 0);
-      red_o   : out std_logic_vector (3 downto 0);
-      green_o : out std_logic_vector (3 downto 0);
-      blue_o  : out std_logic_vector (3 downto 0)
+      clk_i   : in  std_logic;
+      v_px_i  : in  std_logic_vector (g_specs.addr.n_v-1 downto 0);
+      h_px_i  : in  std_logic_vector (g_specs.addr.n_h-1 downto 0);
+      red_o   : out std_logic_vector (g_colour.n_rgb-1 downto 0);
+      green_o : out std_logic_vector (g_colour.n_rgb-1 downto 0);
+      blue_o  : out std_logic_vector (g_colour.n_rgb-1 downto 0)
     );
   end component pattern_gen2;
 
-  component ctrl_mem1
+  component ctrl_mem1 is
     generic (
-      n_colour  : integer;
-      n_px      : integer;
-      n_addr    : integer;
-      i_h_res   : integer;
-      i_v_res   : integer
+      g_specs   : t_vga_specs;
+      g_colour  : t_colour;
+      g_img     : t_image
     );
     port (
       rst_i       : in  std_logic;
       clk_i       : in  std_logic;
-      v_px_i      : in  std_logic_vector (n_px-1 downto 0);
-      h_px_i      : in  std_logic_vector (n_px-1 downto 0);
-      rom_data_i  : in  std_logic_vector (3*n_colour-1 downto 0);
-      rom_addr_o  : out std_logic_vector (n_addr-1 downto 0);
-      red_o       : out std_logic_vector (n_colour-1 downto 0);
-      green_o     : out std_logic_vector (n_colour-1 downto 0);
-      blue_o      : out std_logic_vector (n_colour-1 downto 0)
+      v_px_i      : in  std_logic_vector (g_specs.addr.n_v-1 downto 0);
+      h_px_i      : in  std_logic_vector (g_specs.addr.n_h-1 downto 0);
+      rom_data_i  : in  std_logic_vector (g_colour.n_bus-1 downto 0);
+      rom_addr_o  : out std_logic_vector (g_img.n_rom-1 downto 0);
+      red_o       : out std_logic_vector (g_colour.n_rgb-1 downto 0);
+      green_o     : out std_logic_vector (g_colour.n_rgb-1 downto 0);
+      blue_o      : out std_logic_vector (g_colour.n_rgb-1 downto 0)
     );
   end component ctrl_mem1;
 
@@ -167,25 +151,23 @@ architecture structural of vga_top is
     );
   end component rom_mem1;
 
-  component ctrl_mem2
+  component ctrl_mem2 is
     generic (
-      n_colour  : integer;
-      n_px      : integer;
-      n_addr    : integer;
-      i_h_res   : integer;
-      i_v_res   : integer
+      g_specs   : t_vga_specs;
+      g_colour  : t_colour;
+      g_img     : t_image
     );
     port (
       rst_i       : in  std_logic;
       clk_i       : in  std_logic;
-      v_px_i      : in  std_logic_vector (n_px-1 downto 0);
-      h_px_i      : in  std_logic_vector (n_px-1 downto 0);
-      rom_data_i  : in  std_logic_vector (3*n_colour-1 downto 0);
+      v_px_i      : in  std_logic_vector (g_specs.addr.n_v-1 downto 0);
+      h_px_i      : in  std_logic_vector (g_specs.addr.n_h-1 downto 0);
+      rom_data_i  : in  std_logic_vector (g_colour.n_bus-1 downto 0);
       pb_i        : in  std_logic_vector (3 downto 0);
-      rom_addr_o  : out std_logic_vector (n_addr-1 downto 0);
-      red_o       : out std_logic_vector (n_colour-1 downto 0);
-      green_o     : out std_logic_vector (n_colour-1 downto 0);
-      blue_o      : out std_logic_vector (n_colour-1 downto 0)
+      rom_addr_o  : out std_logic_vector (g_img.n_rom-1 downto 0);
+      red_o       : out std_logic_vector (g_colour.n_rgb-1 downto 0);
+      green_o     : out std_logic_vector (g_colour.n_rgb-1 downto 0);
+      blue_o      : out std_logic_vector (g_colour.n_rgb-1 downto 0)
     );
   end component ctrl_mem2;
 
@@ -209,58 +191,68 @@ architecture structural of vga_top is
   signal s_sw_sync    : std_logic_vector (2 downto 0);
 
   -- Internal horizontal and vertical pixel index
-  signal s_px_h       : std_logic_vector (C_N_PX-1 downto 0);
-  signal s_px_v       : std_logic_vector (C_N_PX-1 downto 0);
+  signal s_px_h       : std_logic_vector (g_specs.addr.n_h-1 downto 0);
+  signal s_px_v       : std_logic_vector (g_specs.addr.n_v-1 downto 0);
 
   -- Internal ROM 1 communication signals
-  signal s_rom1_data  : std_logic_vector (3*C_N_COLOUR-1 downto 0);
-  signal s_rom1_addr  : std_logic_vector (C_N_ADDR1-1 downto 0);
+  signal s_rom1_data  : std_logic_vector (g_colour.n_bus-1 downto 0);
+  signal s_rom1_addr  : std_logic_vector (g_img1.n_rom-1 downto 0);
 
   -- Internal ROM 2 communication signals
-  signal s_rom2_data  : std_logic_vector (3*C_N_COLOUR-1 downto 0);
-  signal s_rom2_addr  : std_logic_vector (C_N_ADDR2-1 downto 0);
+  signal s_rom2_data  : std_logic_vector (g_colour.n_bus-1 downto 0);
+  signal s_rom2_addr  : std_logic_vector (g_img2.n_rom-1 downto 0);
 
   -- Internal RGB channels of Pattern Generator 1
-  signal s_pg1_red    : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_pg1_green  : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_pg1_blue   : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_pg1_rgb    : std_logic_vector (3*C_N_COLOUR-1 downto 0);
+  signal s_pg1_red    : std_logic_vector (g_colour.n_rgb-1 downto 0);
+  signal s_pg1_green  : std_logic_vector (g_colour.n_rgb-1 downto 0);
+  signal s_pg1_blue   : std_logic_vector (g_colour.n_rgb-1 downto 0);
+  signal s_pg1_rgb    : std_logic_vector (g_colour.n_bus-1 downto 0);
 
   -- Internal RGB channels of Pattern Generator 2
-  signal s_pg2_red    : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_pg2_green  : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_pg2_blue   : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_pg2_rgb    : std_logic_vector (3*C_N_COLOUR-1 downto 0);
+  signal s_pg2_red    : std_logic_vector (g_colour.n_rgb-1 downto 0);
+  signal s_pg2_green  : std_logic_vector (g_colour.n_rgb-1 downto 0);
+  signal s_pg2_blue   : std_logic_vector (g_colour.n_rgb-1 downto 0);
+  signal s_pg2_rgb    : std_logic_vector (g_colour.n_bus-1 downto 0);
 
   -- Internal RGB channels of Memory Control 1
-  signal s_mem1_red    : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_mem1_green  : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_mem1_blue   : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_mem1_rgb    : std_logic_vector (3*C_N_COLOUR-1 downto 0);
+  signal s_mem1_red    : std_logic_vector (g_colour.n_rgb-1 downto 0);
+  signal s_mem1_green  : std_logic_vector (g_colour.n_rgb-1 downto 0);
+  signal s_mem1_blue   : std_logic_vector (g_colour.n_rgb-1 downto 0);
+  signal s_mem1_rgb    : std_logic_vector (g_colour.n_bus-1 downto 0);
 
   -- Internal RGB channels of Memory Control 2
-  signal s_mem2_red    : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_mem2_green  : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_mem2_blue   : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_mem2_rgb    : std_logic_vector (3*C_N_COLOUR-1 downto 0);
+  signal s_mem2_red    : std_logic_vector (g_colour.n_rgb-1 downto 0);
+  signal s_mem2_green  : std_logic_vector (g_colour.n_rgb-1 downto 0);
+  signal s_mem2_blue   : std_logic_vector (g_colour.n_rgb-1 downto 0);
+  signal s_mem2_rgb    : std_logic_vector (g_colour.n_bus-1 downto 0);
 
   -- Internal RGB channels of MUX
-  signal s_mux_red    : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_mux_green  : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_mux_blue   : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_mux_rgb    : std_logic_vector (3*C_N_COLOUR-1 downto 0);
+  signal s_mux_red    : std_logic_vector (g_colour.n_rgb-1 downto 0);
+  signal s_mux_green  : std_logic_vector (g_colour.n_rgb-1 downto 0);
+  signal s_mux_blue   : std_logic_vector (g_colour.n_rgb-1 downto 0);
+  signal s_mux_rgb    : std_logic_vector (g_colour.n_bus-1 downto 0);
 
 
 begin
 
   -- Map all 3 RGB channels to one bus
-  s_pg1_rgb  <= (s_pg1_blue,  s_pg1_green,  s_pg1_red );
-  s_pg2_rgb  <= (s_pg2_blue,  s_pg2_green,  s_pg2_red );
-  s_mem1_rgb <= (s_mem1_blue, s_mem1_green, s_mem1_red);
-  s_mem2_rgb <= (s_mem2_blue, s_mem2_green, s_mem2_red);
+  -- s_pg1_rgb  <= (s_pg1_blue,  s_pg1_green,  s_pg1_red );
+  -- s_pg2_rgb  <= (s_pg2_blue,  s_pg2_green,  s_pg2_red );
+  -- s_mem1_rgb <= (s_mem1_blue, s_mem1_green, s_mem1_red);
+  -- s_mem2_rgb <= (s_mem2_blue, s_mem2_green, s_mem2_red);
+
+  p_rgb_to_bus(g_colour.n_rgb, s_pg1_rgb,
+    s_pg1_red,  s_pg1_green,  s_pg1_blue);
+  p_rgb_to_bus(g_colour.n_rgb, s_pg2_rgb,
+    s_pg2_red,  s_pg2_green,  s_pg2_blue);
+  p_rgb_to_bus(g_colour.n_rgb, s_mem1_rgb,
+    s_mem1_red, s_mem1_green, s_mem1_blue);
+  p_rgb_to_bus(g_colour.n_rgb, s_mem2_rgb,
+    s_mem2_red, s_mem2_green, s_mem2_blue);
 
   -- Split RGB bus into 3 channels
-  (s_mux_blue,  s_mux_green,  s_mux_red ) <= s_mux_rgb;
+  --(s_mux_blue,  s_mux_green,  s_mux_red ) <= s_mux_rgb;
+  p_bus_to_rgb(g_colour.n_rgb, s_mux_rgb, s_mux_red, s_mux_green, s_mux_blue);
 
   ------------------------------------------------------------------------------
   -- VGA PLL
@@ -280,18 +272,8 @@ begin
   ------------------------------------------------------------------------------
   u_controller: vga_ctrl
   generic map (
-    n_colour          => C_N_COLOUR,
-    n_px              => C_N_PX,
-    h_px_visible_area => C_H_PX_VISIBLE_AREA,
-    h_px_front_porch  => C_H_PX_FRONT_PORCH,
-    h_px_sync_pulse   => C_H_PX_SYNC_PULSE,
-    h_px_back_porch   => C_H_PX_BACK_PORCH,
-    h_px_whole_line   => C_H_PX_WHOLE_LINE,
-    v_ln_visible_area => C_V_LN_VISIBLE_AREA,
-    v_ln_front_porch  => C_V_LN_FRONT_PORCH,
-    v_ln_sync_pulse   => C_V_LN_SYNC_PULSE,
-    v_ln_back_porch   => C_V_LN_BACK_PORCH,
-    v_ln_whole_frame  => C_V_LN_WHOLE_FRAME
+    g_specs   => g_specs,
+    g_colour  => g_colour
   )
   port map (
     rst_i    => rst_i,
@@ -314,8 +296,8 @@ begin
   ------------------------------------------------------------------------------
   u_io: io_debounce
   generic map (
-    f_sys      => C_F_CLK,
-    f_debounce => C_F_DB,
+    f_sys      => g_f_osc,
+    f_debounce => g_f_db,
     n_sw       => sw_i'length,
     n_pb       => pb_i'length
   )
@@ -333,7 +315,7 @@ begin
   ------------------------------------------------------------------------------
   u_mux: source_mux
   generic map (
-    n_colour => C_N_COLOUR
+    g_colour => g_colour
   )
   port map (
     sw_sync_i   => s_sw_sync,
@@ -349,9 +331,8 @@ begin
   ------------------------------------------------------------------------------
   u_pg1: pattern_gen1
   generic map (
-    n_colour  => C_N_COLOUR,
-    n_px      => C_N_PX,
-    i_h_res   => C_H_PX_VISIBLE_AREA
+    g_specs   => g_specs,
+    g_colour  => g_colour
   )
   port map (
     rst_i   => rst_i,
@@ -368,10 +349,8 @@ begin
   ------------------------------------------------------------------------------
   u_pg2: pattern_gen2
   generic map (
-    n_colour  => C_N_COLOUR,
-    n_px      => C_N_PX,
-    i_h_res   => C_H_PX_VISIBLE_AREA,
-    i_v_res   => C_V_LN_VISIBLE_AREA
+    g_specs   => g_specs,
+    g_colour  => g_colour
   )
   port map (
     clk_i   => clk_i,
@@ -388,11 +367,9 @@ begin
   ------------------------------------------------------------------------------
   u_mc1: ctrl_mem1
   generic map (
-    n_colour  => C_N_COLOUR,
-    n_px      => C_N_PX,
-    n_addr    => C_N_ADDR1,
-    i_h_res   => C_H_PX_VISIBLE_AREA,
-    i_v_res   => C_V_LN_VISIBLE_AREA
+    g_specs   => g_specs,
+    g_colour  => g_colour,
+    g_img     => g_img1
   )
   port map (
     rst_i       => rst_i,
@@ -421,11 +398,9 @@ begin
   ------------------------------------------------------------------------------
   u_mc2: ctrl_mem2
   generic map (
-    n_colour  => C_N_COLOUR,
-    n_px      => C_N_PX,
-    n_addr    => C_N_ADDR2,
-    i_h_res   => C_H_PX_VISIBLE_AREA,
-    i_v_res   => C_V_LN_VISIBLE_AREA
+    g_specs   => g_specs,
+    g_colour  => g_colour,
+    g_img     => g_img2
   )
   port map (
     rst_i       => rst_i,

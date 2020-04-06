@@ -46,9 +46,9 @@ begin
     if s_img = '1' then
       p_bus_to_rgb(g_colour.n_rgb, rom_data_i, red_o, green_o, blue_o);
     else
-      red_o <= (others => '0');
-      green_o <= (others => '0');
-      blue_o <= (others => '0');
+      red_o <= (others => '1');
+      green_o <= (others => '1');
+      blue_o <= (others => '1');
     end if;
   end process p_rgb;
 

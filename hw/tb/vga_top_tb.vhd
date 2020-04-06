@@ -5,9 +5,9 @@
 -- File :       vga_top_tb.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 02.04.2020
+-- Last update: 06.04.2020
 -- Platform :   ModelSim - Starter Edition 10.5b
--- Language:    VHDL 1076-2008
+-- Language:    VHDL 1076-2002
 --------------------------------------------------------------------------------
 -- Description: The "VGA Top" unit combines all elements together to one
 --              VGA controller with implemented image generators.
@@ -22,14 +22,13 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 library work;
-use work.vga_top_pkg.all;
+use work.vga_specs_pkg.all;
+use work.vga_sim_pkg.all;
 
 entity vga_top_tb is
 end vga_top_tb;
 
 architecture sim of vga_top_tb is
-
-  constant C_T : time := 1_000_000_000 ns / C_F_CLK;
 
   ------------------------------------------------------------------------------
   -- COMPONENTS
@@ -52,8 +51,12 @@ architecture sim of vga_top_tb is
 
   component vga_top
     generic (
-      n_colour : integer := 4;
-      n_px     : integer := 10
+      g_specs   : t_vga_specs := VGA_640x480_60Hz;
+      g_colour  : t_colour    := VGA_4bit_RGB;
+      g_img1    : t_image     := VGA_320x240_IMG;
+      g_img2    : t_image     := VGA_100x100_IMG;
+      g_f_osc   : natural     := 100_000_000;
+      g_f_db    : natural     :=       1_000
     );
     port (
       rst_i : in  std_logic;
@@ -62,9 +65,9 @@ architecture sim of vga_top_tb is
       sw_i  : in  std_logic_vector (2 downto 0);
       h_sync_o : out std_logic;
       v_sync_o : out std_logic;
-      red_o    : out std_logic_vector (n_colour-1 downto 0);
-      green_o  : out std_logic_vector (n_colour-1 downto 0);
-      blue_o   : out std_logic_vector (n_colour-1 downto 0)
+      red_o    : out std_logic_vector (g_colour.n_rgb-1 downto 0);
+      green_o  : out std_logic_vector (g_colour.n_rgb-1 downto 0);
+      blue_o   : out std_logic_vector (g_colour.n_rgb-1 downto 0)
     );
   end component vga_top;
 
@@ -79,9 +82,9 @@ architecture sim of vga_top_tb is
   signal s_sw_i      : std_logic_vector (2 downto 0);
   signal s_h_sync_o  : std_logic;
   signal s_v_sync_o  : std_logic;
-  signal s_red_o     : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_green_o   : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_blue_o    : std_logic_vector (C_N_COLOUR-1 downto 0);
+  signal s_red_o     : std_logic_vector (COLOUR.n_rgb-1 downto 0);
+  signal s_green_o   : std_logic_vector (COLOUR.n_rgb-1 downto 0);
+  signal s_blue_o    : std_logic_vector (COLOUR.n_rgb-1 downto 0);
 
 begin
 
@@ -106,6 +109,14 @@ begin
   -- Device under Test
   ------------------------------------------------------------------------------
   u_dut: vga_top
+  generic map (
+    g_specs   => SPECS,
+    g_colour  => COLOUR,
+    g_img1    => IMG1,
+    g_img2    => IMG2,
+    g_f_osc   => F_VGA,
+    g_f_db    => F_DB
+  )
   port map (
     rst_i     => s_rst_i,
     clk_i     => s_clk_i,
@@ -119,20 +130,13 @@ begin
   );
 
   -- Generate reset pulse and clock signal
-  s_rst_i <= '0' after 200 ns;
-  s_clk_i <= not s_clk_i after C_T/2;
+  s_rst_i <= '0' after T_RST;
+  s_clk_i <= not s_clk_i after T_VGA / 2;
 
   p_pb: process
   begin
     s_pb_i <= (others => '0');
     wait for 500 ns;
-
-    loop
-      s_pb_i(0) <= '1';
-      wait for 500 us;
-      s_pb_i(0) <= '0';
-      wait for 500 us;
-    end loop;
 
     s_pb_i(0) <= '1';
     wait for 1 ms;
@@ -179,10 +183,6 @@ begin
     wait until s_v_sync_o = '1';
     s_sw_i <= (others => '0');
 
-    -- MEMORY CONTROL 2
-    wait until s_v_sync_o = '1';
-    s_sw_i <= (2 => '1', others => '0');
-
     -- PATTERN GENERATOR 2
     wait until s_v_sync_o = '1';
     s_sw_i <= (0 => '1', others => '0');
@@ -190,6 +190,10 @@ begin
     -- MEMORY CONTROL 1
     wait until s_v_sync_o = '1';
     s_sw_i <= (1 => '1', others => '0');
+
+    -- MEMORY CONTROL 2
+    wait until s_v_sync_o = '1';
+    s_sw_i <= (2 => '1', others => '0');
 
     wait;
 

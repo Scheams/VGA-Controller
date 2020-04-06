@@ -3,7 +3,7 @@ file copy -force ../../generate/ip_user_files/mem_init_files/rom_mem2.mif ./
 
 vcom ../../hdl/vga_specs_pkg.vhd
 vcom ../../hdl/vga_ctrl_pkg.vhd
-vcom ../../hdl/vga_top_pkg.vhd
+vcom ../../tb/vga_sim_pkg.vhd
 
 vlog ../../generate/vga_pll/vga_pll_clk_wiz.v
 vlog ../../generate/vga_pll/vga_pll.v
