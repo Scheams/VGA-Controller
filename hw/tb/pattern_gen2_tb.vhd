@@ -5,9 +5,9 @@
 -- File :       pattern_gen2_tb.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 02.04.2020
+-- Last update: 06.04.2020
 -- Platform :   ModelSim - Starter Edition 10.5b
--- Language:    VHDL 1076-2008
+-- Language:    VHDL 1076-2002
 --------------------------------------------------------------------------------
 -- Description: The "Pattern Generator 2" unit creates a chess-like format with
 --              the colours Red-Green-Blue. Over the whole frame there are
@@ -18,10 +18,13 @@
 -- 29.03.2020   v1.0.0   Christoph Amon   Initial stage
 --------------------------------------------------------------------------------
 
-
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
+library work;
+use work.vga_specs_pkg.all;
+use work.vga_sim_pkg.all;
 
 entity pattern_gen2_tb is
 end entity pattern_gen2_tb;
@@ -49,19 +52,17 @@ architecture sim of pattern_gen2_tb is
 
   component pattern_gen2 is
     generic (
-      n_colour  : integer;
-      n_px      : integer;
-      i_h_res   : integer;
-      i_v_res   : integer
+      g_specs   : t_vga_specs;
+      g_colour  : t_colour
     );
     port (
       rst_i   : in  std_logic;
       clk_i   : in  std_logic;
-      v_px_i  : in  std_logic_vector (n_px-1 downto 0);
-      h_px_i  : in  std_logic_vector (n_px-1 downto 0);
-      red_o   : out std_logic_vector (n_colour-1 downto 0);
-      green_o : out std_logic_vector (n_colour-1 downto 0);
-      blue_o  : out std_logic_vector (n_colour-1 downto 0)
+      v_px_i  : in  std_logic_vector (g_specs.addr.n_v-1 downto 0);
+      h_px_i  : in  std_logic_vector (g_specs.addr.n_h-1 downto 0);
+      red_o   : out std_logic_vector (g_colour.n_rgb-1 downto 0);
+      green_o : out std_logic_vector (g_colour.n_rgb-1 downto 0);
+      blue_o  : out std_logic_vector (g_colour.n_rgb-1 downto 0)
     );
   end component pattern_gen2;
 
@@ -69,20 +70,20 @@ architecture sim of pattern_gen2_tb is
   -- TYPEDEFS
   ------------------------------------------------------------------------------
 
-  -- t_colour: Represent colours and help during debugging
-  type t_colour is (RED, GREEN, BLUE, UNKOWN);
+  -- t_debug_colour: Represent colours and help during debugging
+  type t_debug_colour is (RED, GREEN, BLUE, UNKOWN);
 
   -- Signals for In- and Outputs
   signal s_rst_i   : std_logic := '1';
   signal s_clk_i   : std_logic := '1';
-  signal s_v_px_i  : std_logic_vector (C_N_PX-1 downto 0) := (others => '1');
-  signal s_h_px_i  : std_logic_vector (C_N_PX-1 downto 0) := (others => '1');
-  signal s_red_o   : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_green_o : std_logic_vector (C_N_COLOUR-1 downto 0);
-  signal s_blue_o  : std_logic_vector (C_N_COLOUR-1 downto 0);
+  signal s_v_px_i  : std_logic_vector (SPECS.addr.n_v-1 downto 0);
+  signal s_h_px_i  : std_logic_vector (SPECS.addr.n_h-1 downto 0);
+  signal s_red_o   : std_logic_vector (COLOUR.n_rgb-1 downto 0);
+  signal s_green_o : std_logic_vector (COLOUR.n_rgb-1 downto 0);
+  signal s_blue_o  : std_logic_vector (COLOUR.n_rgb-1 downto 0);
 
   -- s_colour: Variable to track during simulation
-  signal s_colour  : t_colour;
+  signal s_colour  : t_debug_colour;
 
   -- s_v_back_porch: Simulation info for vertical back porch
   -- s_v_front_porch: Simulation info for vertical front porch
@@ -100,10 +101,8 @@ begin
   ------------------------------------------------------------------------------
   u_dut : pattern_gen2
   generic map (
-    n_colour  => C_N_COLOUR,
-    n_px      => C_N_PX,
-    i_h_res   => C_I_H_RES,
-    i_v_res   => C_I_V_RES
+    g_specs   => SPECS,
+    g_colour  => COLOUR
   )
   port map (
     rst_i   => s_rst_i,
@@ -116,8 +115,8 @@ begin
   );
 
   -- Create reset pulse and clock
-  s_rst_i <= '0' after C_T/2;
-  s_clk_i <= not s_clk_i after C_T/2;
+  s_rst_i <= '0' after T_RST;
+  s_clk_i <= not s_clk_i after T_OSC / 2;
 
   ------------------------------------------------------------------------------
   -- Map the RGB outputs of DUT to a readable enum
@@ -143,14 +142,17 @@ begin
   p_sim: process
   begin
 
-    wait for C_T;
+    s_v_px_i <= (others => '0');
+    s_h_px_i <= (others => '0');
+
+    wait for T_RST;
 
     loop
 
       -- V Back Porch
       s_v_back_porch <= '1';
       for i in 0 to 26399 loop
-        wait for C_T;
+        wait for T_VGA;
       end loop;
       s_v_back_porch <= '0';
 
@@ -160,7 +162,7 @@ begin
         -- H Sync + Back Porch
         s_h_back_porch <= '1';
         for i in 0 to 143 loop
-          wait for C_T;
+          wait for T_VGA;
         end loop;
         s_h_back_porch <= '0';
 
@@ -169,13 +171,13 @@ begin
         -- RGB Data
         for x in 0 to 639 loop
           s_h_px_i <= std_logic_vector(to_unsigned(x, s_h_px_i'length));
-          wait for C_T;
+          wait for T_VGA;
         end loop;
 
         -- H Front Porch
         s_h_front_porch <= '1';
         for i in 0 to 15 loop
-          wait for C_T;
+          wait for T_VGA;
         end loop;
         s_h_front_porch <= '0';
 
@@ -184,7 +186,7 @@ begin
       -- V Front Porch
       s_v_front_porch <= '1';
       for i in 0 to 7999 loop
-        wait for C_T;
+        wait for T_VGA;
       end loop;
       s_v_front_porch <= '0';
 

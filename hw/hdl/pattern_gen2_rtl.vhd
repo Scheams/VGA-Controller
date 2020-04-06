@@ -5,9 +5,9 @@
 -- File :       pattern_gen2_rtl.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 02.04.2020
+-- Last update: 06.04.2020
 -- Platform :   ModelSim - Starter Edition 10.5b
--- Language:    VHDL 1076-2008
+-- Language:    VHDL 1076-2002
 --------------------------------------------------------------------------------
 -- Description: The "Pattern Generator 2" unit creates a chess-like format with
 --              the colours Red-Green-Blue. Over the whole frame there are
@@ -22,6 +22,9 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+library work;
+use work.vga_specs_pkg.all;
+
 architecture rtl of pattern_gen2 is
 
   ------------------------------------------------------------------------------
@@ -30,8 +33,8 @@ architecture rtl of pattern_gen2 is
 
   -- C_TILE_WIDTH: Pixel width of each tile
   -- C_TILE_HEIGHT: Pixel width of each tile
-  constant C_TILE_WIDTH  : natural := i_h_res / 10;
-  constant C_TILE_HEIGHT : natural := i_v_res / 10;
+  constant C_TILE_WIDTH  : natural := g_specs.px_h.visible_area / 10;
+  constant C_TILE_HEIGHT : natural := g_specs.ln_v.visible_area / 10;
 
   ------------------------------------------------------------------------------
   -- SIGNALS
@@ -41,7 +44,7 @@ architecture rtl of pattern_gen2 is
   -- s_colour: Colour information in one-hot encoding
   --           (001 -> Red, 010 -> Green, 100 -> Blue)
   -- s_start_colour: Start colour for each line
-  signal s_h_px_prev    : std_logic_vector (n_px-1 downto 0);
+  signal s_h_px_prev    : std_logic_vector (g_specs.addr.n_h-1 downto 0);
   signal s_colour       : unsigned (2 downto 0);
   signal s_start_colour : unsigned (2 downto 0);
 
@@ -55,8 +58,8 @@ begin
 
     -- v_h_cnt: Counter for horizontal pixels
     -- v_v_cnt: Counter for vertical pixels
-    variable v_h_cnt : natural range 0 to i_h_res;
-    variable v_v_cnt : natural range 0 to i_v_res;
+    variable v_h_cnt : natural range 0 to g_specs.px_h.visible_area;
+    variable v_v_cnt : natural range 0 to g_specs.ln_v.visible_area;
 
   begin
 
