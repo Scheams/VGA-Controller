@@ -5,9 +5,9 @@
 -- File :       ctrl_mem2_rtl.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 04.04.2020
+-- Last update: 06.04.2020
 -- Platform :   ModelSim - Starter Edition 10.5b
--- Language:    VHDL 1076-2008
+-- Language:    VHDL 1076-2002
 --------------------------------------------------------------------------------
 -- Description: The "Memory Control 1" unit reads the stored information from
 --              the ROM 1 which is a 320x240 image. This image gets then shown
@@ -23,10 +23,13 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+library work;
+use work.vga_specs_pkg.all;
+
 architecture rtl of ctrl_mem2 is
 
-  signal s_prev_px : std_logic_vector (n_px-1 downto 0);
-  signal s_cnt_img : unsigned (n_addr-1 downto 0);
+  signal s_prev_px : std_logic_vector (g_specs.addr.n_h-1 downto 0);
+  signal s_cnt_img : unsigned (g_img.n_rom-1 downto 0);
   signal s_img     : std_logic;
 
   signal s_pb_prev : std_logic_vector (pb_i'length-1 downto 0);
@@ -41,7 +44,7 @@ begin
   p_rgb: process (s_img, rom_data_i)
   begin
     if s_img = '1' then
-      (red_o, green_o, blue_o) <= rom_data_i;
+      p_bus_to_rgb(g_colour.n_rgb, rom_data_i, red_o, green_o, blue_o);
     else
       red_o <= (others => '0');
       green_o <= (others => '0');
@@ -65,7 +68,7 @@ begin
     elsif clk_i'event and (clk_i = '1') then
 
       if s_pb_prev(0) = '0' and pb_i(0) = '1' then
-        if s_h_tmp_offset < i_h_res - 100 then
+        if s_h_tmp_offset < g_specs.px_h.visible_area - g_img.width then
           s_h_tmp_offset <= s_h_tmp_offset + 30;
         end if;
       end if;
@@ -83,13 +86,16 @@ begin
       end if;
 
       if s_pb_prev(3) = '0' and pb_i(3) = '1' then
-        if s_v_tmp_offset < i_v_res - 100 then
+        if s_v_tmp_offset < g_specs.ln_v.visible_area - g_img.height then
           s_v_tmp_offset <= s_v_tmp_offset + 30;
         end if;
       end if;
 
       if s_prev_px /= h_px_i then
-        if unsigned(h_px_i) >= s_h_offset and unsigned(h_px_i) < 100+s_h_offset and unsigned(v_px_i) >= s_v_offset and unsigned(v_px_i) < 100+s_v_offset then
+        if (unsigned(h_px_i) >= s_h_offset) and
+           (unsigned(h_px_i) < g_img.width+s_h_offset) and
+           (unsigned(v_px_i) >= s_v_offset) and
+           (unsigned(v_px_i) < g_img.height+s_v_offset) then
           s_cnt_img <= s_cnt_img + 1;
           s_img <= '1';
         else
@@ -102,8 +108,9 @@ begin
 
           s_h_offset <= s_h_tmp_offset;
           s_v_offset <= s_v_tmp_offset;
-        elsif unsigned(s_cnt_img) >= 10000-1 then
-          rom_addr_o <= std_logic_vector(to_unsigned(10000-1, rom_addr_o'length));
+        elsif unsigned(s_cnt_img) >= g_img.size_rom-1 then
+          rom_addr_o <= std_logic_vector(
+                        to_unsigned(g_img.size_rom-1, g_img.n_rom));
         else
           rom_addr_o <= std_logic_vector(s_cnt_img + 1);
         end if;
