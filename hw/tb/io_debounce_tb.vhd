@@ -5,9 +5,9 @@
 -- File :       io_debounce_tb.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 01.04.2020
+-- Last update: 06.04.2020
 -- Platform :   ModelSim - Starter Edition 10.5b
--- Language:    VHDL 1076-2008
+-- Language:    VHDL 1076-2002
 --------------------------------------------------------------------------------
 -- Description: The "IO Debounce" Unit is able to debounce switches and
 --              pushbuttons. The debounce frequency can be set, the default

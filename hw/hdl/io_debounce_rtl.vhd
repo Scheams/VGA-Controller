@@ -5,9 +5,9 @@
 -- File :       io_debounce_rtl.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 01.04.2020
+-- Last update: 06.04.2020
 -- Platform :   ModelSim - Starter Edition 10.5b
--- Language:    VHDL 1076-2008
+-- Language:    VHDL 1076-2002
 --------------------------------------------------------------------------------
 -- Description: The "IO Debounce" Unit is able to debounce switches and
 --              pushbuttons. The debounce frequency can be set, the default
@@ -56,7 +56,7 @@ begin
       s_en <= '0';
       s_counter <= 0;
 
-    elsif rising_edge(clk_i) then
+    elsif clk_i'event and (clk_i = '1') then
       -- Set enable signal for one clock cycle and reload counter
       if s_counter = 0 then
         s_counter <= C_PRELOAD;
@@ -99,7 +99,8 @@ begin
       if s_en = '1' then
         -- Go through a 2-stage FF (push-buttons and switches get combined)
         v_ff1 := v_ff0;
-        v_ff0 := (pb_i, sw_i);
+        v_ff0 (n_pb-1 downto 0) := pb_i;
+        v_ff0 (n_pb+n_sw-1 downto n_pb) := sw_i;
 
         -- Create a set and clear mask
         v_set := v_ff0 and v_ff1;
@@ -109,7 +110,8 @@ begin
         v_sync := (v_sync and (not v_clear)) or v_set;
 
         -- Split up into push-buttons and switches
-        (pb_sync_o, sw_sync_o) <= v_sync;
+        pb_sync_o <= v_sync (n_pb-1 downto 0);
+        sw_sync_o <= v_sync (n_pb+n_sw-1 downto n_pb);
       end if;
     end if;
   end process p_debounce;

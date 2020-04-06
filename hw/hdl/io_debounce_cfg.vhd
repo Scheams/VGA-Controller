@@ -5,9 +5,9 @@
 -- File :       io_debounce_cfg.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 01.04.2020
+-- Last update: 06.04.2020
 -- Platform :   ModelSim - Starter Edition 10.5b
--- Language:    VHDL 1076-2008
+-- Language:    VHDL 1076-2002
 --------------------------------------------------------------------------------
 -- Description: The "IO Debounce" Unit is able to debounce switches and
 --              pushbuttons. The debounce frequency can be set, the default
@@ -20,6 +20,10 @@
 -- 30.03.2020   v1.0.0   Christoph Amon   Initial stage
 -- 01.04.2020   v2.0.0   Christoph Amon   From IO Control to IO Debounce Unit
 --------------------------------------------------------------------------------
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 configuration io_debounce_rtl of io_debounce is
   for rtl
