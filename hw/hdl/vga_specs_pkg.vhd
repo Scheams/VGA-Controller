@@ -5,9 +5,9 @@
 -- File :       vga_specs_pkg.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 04.04.2020
+-- Last update: 06.04.2020
 -- Platform :   ModelSim - Starter Edition 10.5b
--- Language:    VHDL 1076-2008
+-- Language:    VHDL 1076-2002
 --------------------------------------------------------------------------------
 -- Description: The "VGA Specifications" package includes constants for
 --              predefined VGA specifications.
@@ -18,6 +18,10 @@
 -- 04.04.2020   v1.0.0   Christoph Amon   Initial stage
 --------------------------------------------------------------------------------
 
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
 package vga_specs_pkg is
 
   ------------------------------------------------------------------------------
@@ -25,9 +29,16 @@ package vga_specs_pkg is
   ------------------------------------------------------------------------------
 
   type t_colour is record
-    n_colour  : natural;
     n_rgb     : natural;
+    n_bus     : natural;
   end record t_colour;
+
+  type t_image is record
+    height    : natural;
+    width     : natural;
+    n_rom     : natural;
+    size_rom  : natural;
+  end record t_image;
 
   type t_vga_frequency is record
     f_pixel     : natural;
@@ -50,7 +61,7 @@ package vga_specs_pkg is
     front_porch   : natural;
     sync_pulse    : natural;
     back_porch    : natural;
-    whole_frame    : natural;
+    whole_frame   : natural;
   end record t_vga_v_timing;
 
   type t_vga_addr is record
@@ -71,8 +82,22 @@ package vga_specs_pkg is
   ------------------------------------------------------------------------------
 
   constant VGA_4bit_RGB : t_colour := (
-    n_colour  => 4,
-    n_rgb     => 12
+    n_rgb  => 4,
+    n_bus  => 12
+  );
+
+  constant VGA_100x100_IMG : t_image := (
+    height    => 100,
+    width     => 100,
+    n_rom     => 14,
+    size_rom  => 10000
+  );
+
+  constant VGA_320x240_IMG : t_image := (
+    height    => 320,
+    width     => 240,
+    n_rom     => 17,
+    size_rom  => 76800
   );
 
   constant VGA_640x480_60Hz : t_vga_specs := (
@@ -104,4 +129,50 @@ package vga_specs_pkg is
     )
   );
 
+  procedure p_rgb_to_bus (
+      constant c_n_rgb  : in  natural;
+      signal   s_bus    : out std_logic_vector;
+      signal   s_red    : in  std_logic_vector;
+      signal   s_green  : in  std_logic_vector;
+      signal   s_blue   : in  std_logic_vector
+    );
+
+  procedure p_bus_to_rgb (
+      constant c_n_rgb  : in  natural;
+      signal   s_bus    : in  std_logic_vector;
+      signal   s_red    : out std_logic_vector;
+      signal   s_green  : out std_logic_vector;
+      signal   s_blue   : out std_logic_vector
+    );
+
 end package vga_specs_pkg;
+
+package body vga_specs_pkg is
+
+  procedure p_rgb_to_bus (
+      constant c_n_rgb  : in  natural;
+      signal   s_bus    : out std_logic_vector;
+      signal   s_red    : in  std_logic_vector;
+      signal   s_green  : in  std_logic_vector;
+      signal   s_blue   : in  std_logic_vector
+    ) is
+  begin
+    s_bus (c_n_rgb-1 downto 0) <= s_red;
+    s_bus (c_n_rgb-1 downto 0) <= s_green;
+    s_bus (c_n_rgb-1 downto 0) <= s_blue;
+  end procedure p_rgb_to_bus;
+
+  procedure p_bus_to_rgb (
+      constant c_n_rgb  : in  natural;
+      signal   s_bus    : in  std_logic_vector;
+      signal   s_red    : out std_logic_vector;
+      signal   s_green  : out std_logic_vector;
+      signal   s_blue   : out std_logic_vector
+    ) is
+  begin
+    s_red   <= s_bus (c_n_rgb-1 downto 0);
+    s_green <= s_bus (c_n_rgb-1 downto 0);
+    s_blue  <= s_bus (c_n_rgb-1 downto 0);
+  end procedure p_bus_to_rgb;
+
+end package body vga_specs_pkg;
