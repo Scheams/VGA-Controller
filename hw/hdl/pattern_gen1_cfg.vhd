@@ -5,9 +5,9 @@
 -- File :       pattern_gen1_cfg.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 09.03.2020
+-- Last update: 06.04.2020
 -- Platform :   ModelSim - Starter Edition 10.5b
--- Language:    VHDL 1076-2008
+-- Language:    VHDL 1076-2002
 --------------------------------------------------------------------------------
 -- Description: The "Pattern Generator 1" unit creates a defined pattern for
 --              the VGA controller. The generator creates horizontal stripes

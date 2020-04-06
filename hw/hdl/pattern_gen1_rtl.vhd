@@ -5,9 +5,9 @@
 -- File :       pattern_gen1_rtl.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 02.04.2020
+-- Last update: 06.04.2020
 -- Platform :   ModelSim - Starter Edition 10.5b
--- Language:    VHDL 1076-2008
+-- Language:    VHDL 1076-2002
 --------------------------------------------------------------------------------
 -- Description: The "Pattern Generator 1" unit creates a defined pattern for
 --              the VGA controller. The generator creates horizontal stripes
@@ -30,7 +30,7 @@ architecture rtl of pattern_gen1 is
   ------------------------------------------------------------------------------
 
   -- C_STRIPE_WIDTH: Width in pixel of each horizontal stripe
-  constant C_STRIPE_WIDTH : integer := i_h_res / 16;
+  constant C_STRIPE_WIDTH : integer := g_specs.px_h.visible_area / 16;
 
   ------------------------------------------------------------------------------
   -- SIGNALS
@@ -40,7 +40,7 @@ architecture rtl of pattern_gen1 is
   -- s_counter: Step-down counter for stripe width
   -- s_colour: Maps colours with one-hot encoding
   --           0001 -> Red, 0010 -> Green, 0100 -> Blue, 1000 -> Black
-  signal s_prev_px : std_logic_vector (n_px-1 downto 0);
+  signal s_prev_px : std_logic_vector (g_specs.addr.n_h-1 downto 0);
   signal s_counter : natural range 0 to C_STRIPE_WIDTH;
   signal s_colour  : unsigned (3 downto 0);
 
