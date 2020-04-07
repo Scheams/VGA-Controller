@@ -61,69 +61,72 @@ begin
   p_process: process (rst_i, clk_i)
   begin
 
-    -- Reset counters
-    if rst_i = '1' then
-      s_cnt_img1 <= (others => '0');
-      s_cnt_img2 <= (others => '0');
-      s_cnt_img3 <= (others => '0');
-      s_cnt_img4 <= (others => '0');
-      s_prev_px <= (others => '1');
-      s_rom_addr_o <= (others => '0');
 
-    elsif clk_i'event and (clk_i = '1') then
+    if clk_i'event and (clk_i = '1') then
 
-      if s_prev_px /= h_px_i then
+      -- Reset counters
+      if rst_i = '1' then
+        s_cnt_img1 <= (others => '0');
+        s_cnt_img2 <= (others => '0');
+        s_cnt_img3 <= (others => '0');
+        s_cnt_img4 <= (others => '0');
+        s_prev_px <= (others => '1');
+        s_rom_addr_o <= (others => '0');
 
-        -- Reset all counter
-        if unsigned(v_px_i) = 0 and unsigned(h_px_i) = 0 then
-          s_cnt_img1 <= (others => '0');
-          s_cnt_img2 <= (others => '0');
-          s_cnt_img3 <= (others => '0');
-          s_cnt_img4 <= (others => '0');
-          s_rom_addr_o <= (others => '0');
+      else
+          if s_prev_px /= h_px_i then
 
-        elsif unsigned(h_px_i) < g_img.width then
-          -- First column, first row (1. image)
-          if unsigned(v_px_i) < g_img.height then
-            s_cnt_img1 <= s_cnt_img1 + 1;
-            if s_cnt_img1 >= g_img.size_rom-1 then
-              s_rom_addr_o <= C_MAX_ADDR;
+            -- Reset all counter
+            if unsigned(v_px_i) = 0 and unsigned(h_px_i) = 0 then
+              s_cnt_img1 <= (others => '0');
+              s_cnt_img2 <= (others => '0');
+              s_cnt_img3 <= (others => '0');
+              s_cnt_img4 <= (others => '0');
+              s_rom_addr_o <= (others => '0');
+
+            elsif unsigned(h_px_i) < g_img.width then
+              -- First column, first row (1. image)
+              if unsigned(v_px_i) < g_img.height then
+                s_cnt_img1 <= s_cnt_img1 + 1;
+                if s_cnt_img1 >= g_img.size_rom-1 then
+                  s_rom_addr_o <= C_MAX_ADDR;
+                else
+                  s_rom_addr_o <= std_logic_vector(s_cnt_img1 + 1);
+                end if;
+              -- First column, second row (2. image)
+              else
+                s_cnt_img2 <= s_cnt_img2 + 1;
+                if s_cnt_img2 >= g_img.size_rom-1 then
+                  s_rom_addr_o <= C_MAX_ADDR;
+                else
+                  s_rom_addr_o <= std_logic_vector(s_cnt_img2 + 1);
+                end if;
+              end if;
+
             else
-              s_rom_addr_o <= std_logic_vector(s_cnt_img1 + 1);
-            end if;
-          -- First column, second row (2. image)
-          else
-            s_cnt_img2 <= s_cnt_img2 + 1;
-            if s_cnt_img2 >= g_img.size_rom-1 then
-              s_rom_addr_o <= C_MAX_ADDR;
-            else
-              s_rom_addr_o <= std_logic_vector(s_cnt_img2 + 1);
+              -- Seconds column, first row (3. image)
+              if unsigned(v_px_i) < g_img.height then
+                s_cnt_img3 <= s_cnt_img3 + 1;
+                if s_cnt_img3 >= g_img.size_rom-1 then
+                  s_rom_addr_o <= C_MAX_ADDR;
+                else
+                  s_rom_addr_o <= std_logic_vector(s_cnt_img3 + 1);
+                end if;
+              -- Seconds column, second row (4. image)
+              else
+                s_cnt_img4 <= s_cnt_img4 + 1;
+                if s_cnt_img4 >= g_img.size_rom-1 then
+                  s_rom_addr_o <= C_MAX_ADDR;
+                else
+                  s_rom_addr_o <= std_logic_vector(s_cnt_img4 + 1);
+                end if;
+              end if;
             end if;
           end if;
 
-        else
-          -- Seconds column, first row (3. image)
-          if unsigned(v_px_i) < g_img.height then
-            s_cnt_img3 <= s_cnt_img3 + 1;
-            if s_cnt_img3 >= g_img.size_rom-1 then
-              s_rom_addr_o <= C_MAX_ADDR;
-            else
-              s_rom_addr_o <= std_logic_vector(s_cnt_img3 + 1);
-            end if;
-          -- Seconds column, second row (4. image)
-          else
-            s_cnt_img4 <= s_cnt_img4 + 1;
-            if s_cnt_img4 >= g_img.size_rom-1 then
-              s_rom_addr_o <= C_MAX_ADDR;
-            else
-              s_rom_addr_o <= std_logic_vector(s_cnt_img4 + 1);
-            end if;
-          end if;
+          -- Set previous pixel info
+          s_prev_px <= h_px_i;
         end if;
-      end if;
-
-      -- Set previous pixel info
-      s_prev_px <= h_px_i;
     end if;
   end process p_process;
 

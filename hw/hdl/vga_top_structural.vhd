@@ -236,11 +236,6 @@ architecture structural of vga_top is
 begin
 
   -- Map all 3 RGB channels to one bus
-  -- s_pg1_rgb  <= (s_pg1_blue,  s_pg1_green,  s_pg1_red );
-  -- s_pg2_rgb  <= (s_pg2_blue,  s_pg2_green,  s_pg2_red );
-  -- s_mem1_rgb <= (s_mem1_blue, s_mem1_green, s_mem1_red);
-  -- s_mem2_rgb <= (s_mem2_blue, s_mem2_green, s_mem2_red);
-
   p_rgb_to_bus(g_colour.n_rgb, s_pg1_rgb,
     s_pg1_red,  s_pg1_green,  s_pg1_blue);
   p_rgb_to_bus(g_colour.n_rgb, s_pg2_rgb,
@@ -251,21 +246,18 @@ begin
     s_mem2_red, s_mem2_green, s_mem2_blue);
 
   -- Split RGB bus into 3 channels
-  --(s_mux_blue,  s_mux_green,  s_mux_red ) <= s_mux_rgb;
   p_bus_to_rgb(g_colour.n_rgb, s_mux_rgb, s_mux_red, s_mux_green, s_mux_blue);
 
   ------------------------------------------------------------------------------
   -- VGA PLL
   ------------------------------------------------------------------------------
-  -- dut: vga_pll
-  -- port map (
-  --   reset    => rst_i,
-  --   clk_i    => clk_i,
-  --   clk_o    => s_vga_clk,
-  --   locked_o => s_locked
-  -- );
-  s_vga_clk <= clk_i;
-  s_locked <= '1';
+  u_pll: vga_pll
+  port map (
+    reset    => rst_i,
+    clk_i    => clk_i,
+    clk_o    => s_vga_clk,
+    locked_o => s_locked
+  );
 
   ------------------------------------------------------------------------------
   -- VGA Controller
@@ -302,7 +294,7 @@ begin
     n_pb       => pb_i'length
   )
   port map (
-    clk_i     => clk_i,
+    clk_i     => s_vga_clk,
     rst_i     => rst_i,
     sw_i      => sw_i,
     pb_i      => pb_i,
@@ -336,7 +328,7 @@ begin
   )
   port map (
     rst_i   => rst_i,
-    clk_i   => clk_i,
+    clk_i   => s_vga_clk,
     v_px_i  => s_px_v,
     h_px_i  => s_px_h,
     red_o   => s_pg1_red,
@@ -353,7 +345,7 @@ begin
     g_colour  => g_colour
   )
   port map (
-    clk_i   => clk_i,
+    clk_i   => s_vga_clk,
     rst_i   => rst_i,
     v_px_i  => s_px_v,
     h_px_i  => s_px_h,
@@ -373,7 +365,7 @@ begin
   )
   port map (
     rst_i       => rst_i,
-    clk_i       => clk_i,
+    clk_i       => s_vga_clk,
     v_px_i      => s_px_v,
     h_px_i      => s_px_h,
     rom_data_i  => s_rom1_data,
@@ -388,7 +380,7 @@ begin
   ------------------------------------------------------------------------------
   u_rom1: rom_mem1
   port map (
-    clka  => clk_i,
+    clka  => s_vga_clk,
     addra => s_rom1_addr,
     douta => s_rom1_data
   );
@@ -404,7 +396,7 @@ begin
   )
   port map (
     rst_i       => rst_i,
-    clk_i       => clk_i,
+    clk_i       => s_vga_clk,
     v_px_i      => s_px_v,
     h_px_i      => s_px_h,
     rom_data_i  => s_rom2_data,
@@ -420,7 +412,7 @@ begin
   ------------------------------------------------------------------------------
   u_rom2: rom_mem2
   port map (
-    clka  => clk_i,
+    clka  => s_vga_clk,
     addra => s_rom2_addr,
     douta => s_rom2_data
   );

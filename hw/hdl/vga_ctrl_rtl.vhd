@@ -168,7 +168,7 @@ begin
   -- Control output signals according to current states of horizontal and
   -- vertical stages
   ------------------------------------------------------------------------------
-  p_rgb: process (s_h_state, s_h_counter, s_v_state, s_v_counter)
+  p_rgb: process (s_h_state, s_h_counter, s_v_state, s_v_counter, red_i, green_i, blue_i)
   begin
 
     -- Create H sync pulse
