@@ -5,8 +5,8 @@
 -- File :       ctrl_mem2_rtl.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 06.04.2020
--- Platform :   ModelSim - Starter Edition 10.5b
+-- Last update: 14.04.2020
+-- Platform :   ModelSim - Starter Edition 10.5b, Vivado 2019.2
 -- Language:    VHDL 1076-2002
 --------------------------------------------------------------------------------
 -- Description: The "Memory Control 1" unit reads the stored information from
@@ -17,13 +17,6 @@
 -- Date         Version  Author           Description
 -- 03.04.2020   v1.0.0   Christoph Amon   Initial stage
 --------------------------------------------------------------------------------
-
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
-
-library work;
-use work.vga_specs_pkg.all;
 
 configuration ctrl_mem2_rtl of ctrl_mem2 is
   for rtl

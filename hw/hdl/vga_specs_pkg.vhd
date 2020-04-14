@@ -5,8 +5,8 @@
 -- File :       vga_specs_pkg.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 06.04.2020
--- Platform :   ModelSim - Starter Edition 10.5b
+-- Last update: 14.04.2020
+-- Platform :   ModelSim - Starter Edition 10.5b, Vivado 2019.2
 -- Language:    VHDL 1076-2002
 --------------------------------------------------------------------------------
 -- Description: The "VGA Specifications" package includes constants for
@@ -28,64 +28,73 @@ package vga_specs_pkg is
   -- TYPEDEFS
   ------------------------------------------------------------------------------
 
+  -- Record for colour bit width definition
   type t_colour is record
-    n_rgb     : natural;
-    n_bus     : natural;
+    n_rgb     : natural;    -- Width of one colour
+    n_bus     : natural;    -- Width of a bus of all 3 colours
   end record t_colour;
 
+  -- Record for image information in ROM
   type t_image is record
-    height    : natural;
-    width     : natural;
-    n_rom     : natural;
-    size_rom  : natural;
+    height    : natural;    -- Height of image
+    width     : natural;    -- Width of image
+    n_rom     : natural;    -- Bus width for ROM address
+    size_rom  : natural;    -- Size of ROM
   end record t_image;
 
+  -- Record for freqeuncy
   type t_vga_frequency is record
-    f_pixel     : natural;
-    f_min       : natural;
-    f_max       : natural;
-    f_min_vesa  : natural;
-    f_max_vesa  : natural;
+    f_pixel     : natural;  -- Pixel frequency for VGA controller
+    f_min       : natural;  -- Min frequency (used in simulation)
+    f_max       : natural;  -- Max frequency (used in simulation)
+    f_min_vesa  : natural;  -- Min frequency (used in simulation) VESA standard
+    f_max_vesa  : natural;  -- Max frequency (used in simulation) VESA standard
   end record t_vga_frequency;
 
+  -- Record for horizontal timing specifications
   type t_vga_h_timing is record
-    visible_area  : natural;
-    front_porch   : natural;
-    sync_pulse    : natural;
-    back_porch    : natural;
-    whole_line    : natural;
+    visible_area  : natural;  -- Visible area in pixels
+    front_porch   : natural;  -- Front porch in pixels
+    sync_pulse    : natural;  -- Sync pulse in pixels
+    back_porch    : natural;  -- Back porch in pixels
+    whole_line    : natural;  -- One whole line in pixels
   end record t_vga_h_timing;
 
+  -- Record for vertical timing specifications
   type t_vga_v_timing is record
-    visible_area  : natural;
-    front_porch   : natural;
-    sync_pulse    : natural;
-    back_porch    : natural;
-    whole_frame   : natural;
+    visible_area  : natural;  -- Visible area in lines
+    front_porch   : natural;  -- Front porch in lines
+    sync_pulse    : natural;  -- Sync pulse in lines
+    back_porch    : natural;  -- Back porch in lines
+    whole_frame   : natural;  -- Complete frame in lines
   end record t_vga_v_timing;
 
+  -- Record for addressing lines
   type t_vga_addr is record
-    n_h : natural;
-    n_v : natural;
+    n_h : natural;      -- Bit width of horizontal pixel information
+    n_v : natural;      -- Bit width of vertical line information
   end record t_vga_addr;
 
+  -- Record for complete VGA specifications
   type t_vga_specs is record
-    f_frame : natural;
-    f_px    : t_vga_frequency;
-    px_h    : t_vga_h_timing;
-    ln_v    : t_vga_v_timing;
-    addr    : t_vga_addr;
+    f_frame : natural;          -- Frequency of one frame (FPS)
+    f_px    : t_vga_frequency;  -- Frequency of pixel clock
+    px_h    : t_vga_h_timing;   -- Horizontal timing
+    ln_v    : t_vga_v_timing;   -- Vertical timing
+    addr    : t_vga_addr;       -- Addressing
   end record t_vga_specs;
 
   ------------------------------------------------------------------------------
   -- CONSTANTS
   ------------------------------------------------------------------------------
 
+  -- Use 4 bit colour depth
   constant VGA_4bit_RGB : t_colour := (
     n_rgb  => 4,
     n_bus  => 12
   );
 
+  -- 100x100 px image
   constant VGA_100x100_IMG : t_image := (
     height    => 100,
     width     => 100,
@@ -93,6 +102,7 @@ package vga_specs_pkg is
     size_rom  => 10000
   );
 
+  -- 320x240 px image
   constant VGA_320x240_IMG : t_image := (
     height    => 240,
     width     => 320,
@@ -100,6 +110,7 @@ package vga_specs_pkg is
     size_rom  => 76800
   );
 
+  -- 640x480 resolution with 60 Hz refresh rate
   constant VGA_640x480_60Hz : t_vga_specs := (
     f_frame => 60,
     f_px    => (
@@ -129,6 +140,11 @@ package vga_specs_pkg is
     )
   );
 
+  ------------------------------------------------------------------------------
+  -- PROCEDURES
+  ------------------------------------------------------------------------------
+
+  -- Combine RGB colours to one bus
   procedure p_rgb_to_bus (
       constant c_n_rgb  : in  natural;
       signal   s_bus    : out std_logic_vector;
@@ -137,6 +153,7 @@ package vga_specs_pkg is
       signal   s_blue   : in  std_logic_vector
     );
 
+  -- Split up RGB bus into Red, Green and Blue
   procedure p_bus_to_rgb (
       constant c_n_rgb  : in  natural;
       signal   s_bus    : in  std_logic_vector;

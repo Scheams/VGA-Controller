@@ -5,8 +5,8 @@
 -- File :       rom_mem1_tb.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 06.04.2020
--- Platform :   ModelSim - Starter Edition 10.5b, Vivado 2019.2
+-- Last update: 14.04.2020
+-- Platform :   ModelSim - Starter Edition 10.5b
 -- Language:    VHDL 1076-2002
 --------------------------------------------------------------------------------
 -- Description: The "ROM Mem 1" Unit stores data for the Memory Control 1 unit
@@ -32,6 +32,10 @@ end entity rom_mem1_tb;
 
 architecture sim of rom_mem1_tb is
 
+  ------------------------------------------------------------------------------
+  -- COMPONENT
+  ------------------------------------------------------------------------------
+
   component rom_mem1 is
     port (
       clka  : in  std_logic;
@@ -40,12 +44,20 @@ architecture sim of rom_mem1_tb is
     );
   end component rom_mem1;
 
+  ------------------------------------------------------------------------------
+  -- SIGNALS
+  ------------------------------------------------------------------------------
+
+  -- In- and output signals of DUT
   signal s_clka  : std_logic := '1';
   signal s_addra : std_logic_vector (IMG1.n_rom-1 downto 0) := (others => '0');
   signal s_douta : std_logic_vector (COLOUR.n_bus-1 downto 0);
 
 begin
 
+  ------------------------------------------------------------------------------
+  -- Device under test
+  ------------------------------------------------------------------------------
   u_dut: rom_mem1
   port map (
     clka  => s_clka,
@@ -53,8 +65,12 @@ begin
     douta => s_douta
   );
 
+  -- Create clock signal
   s_clka <= not s_clka after T_OSC / 2;
 
+  ------------------------------------------------------------------------------
+  -- Simulation process, increase address
+  ------------------------------------------------------------------------------
   p_sim: process
   begin
 

@@ -5,8 +5,8 @@
 -- File :       vga_top.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 06.04.2020
--- Platform :   ModelSim - Starter Edition 10.5b
+-- Last update: 14.04.2020
+-- Platform :   ModelSim - Starter Edition 10.5b, Vivado 2019.2
 -- Language:    VHDL 1076-2002
 --------------------------------------------------------------------------------
 -- Description: The "VGA Top" unit combines all elements together to one
@@ -27,10 +27,21 @@ use work.vga_specs_pkg.all;
 entity vga_top is
 
   generic (
+    -- VGA SPECIFICATIONS
+    -- g_specs: General VGA specification
+    -- g_colour: Colour information
     g_specs   : t_vga_specs := VGA_640x480_60Hz;
     g_colour  : t_colour    := VGA_4bit_RGB;
+
+    -- IMAGE SPECIFICATIONS
+    -- g_img1: Image for memory control 1
+    -- g_img2: Image for memory control 2
     g_img1    : t_image     := VGA_320x240_IMG;
     g_img2    : t_image     := VGA_100x100_IMG;
+
+    -- SYSTEM
+    -- g_f_osc: Oscillator frequency
+    -- g_f_db: Button debounce frequency
     g_f_osc   : natural     := 100_000_000;
     g_f_db    : natural     :=       1_000
   );

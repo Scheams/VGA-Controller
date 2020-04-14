@@ -5,7 +5,7 @@
 -- File :       io_debounce_tb.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 06.04.2020
+-- Last update: 14.04.2020
 -- Platform :   ModelSim - Starter Edition 10.5b
 -- Language:    VHDL 1076-2002
 --------------------------------------------------------------------------------
@@ -37,9 +37,11 @@ architecture sim of io_debounce_tb is
   -- CONSTANTS
   ------------------------------------------------------------------------------
 
+  -- Number of switches and pushbuttons to use
   constant C_N_SW   : integer := 2;
   constant C_N_PB   : integer := 2;
 
+  -- Zeros according to number of switches and pushbuttons
   constant C_SW_ZEROS : std_logic_vector (C_N_SW-1 downto 0) := (others => '0');
   constant C_PB_ZEROS : std_logic_vector (C_N_PB-1 downto 0) := (others => '0');
 

@@ -5,8 +5,8 @@
 -- File :       ctrl_mem1_rtl.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 06.04.2020
--- Platform :   ModelSim - Starter Edition 10.5b
+-- Last update: 14.04.2020
+-- Platform :   ModelSim - Starter Edition 10.5b, Vivado 2019.2
 -- Language:    VHDL 1076-2002
 --------------------------------------------------------------------------------
 -- Description: The "Memory Control 1" unit reads the stored information from
@@ -28,6 +28,11 @@ use work.vga_specs_pkg.all;
 
 architecture rtl of ctrl_mem1 is
 
+  ------------------------------------------------------------------------------
+  -- CONSTANTS
+  ------------------------------------------------------------------------------
+
+  -- Max address of ROM
   constant C_MAX_ADDR : std_logic_vector (g_img.n_rom-1 downto 0)
     := std_logic_vector(to_unsigned(g_img.size_rom - 1, g_img.n_rom));
 
@@ -64,7 +69,7 @@ begin
 
     if clk_i'event and (clk_i = '1') then
 
-      -- Reset counters
+      -- Reset counters (Synch reset for ROM)
       if rst_i = '1' then
         s_cnt_img1 <= (others => '0');
         s_cnt_img2 <= (others => '0');

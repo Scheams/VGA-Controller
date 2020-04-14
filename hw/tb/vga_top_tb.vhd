@@ -5,7 +5,7 @@
 -- File :       vga_top_tb.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 06.04.2020
+-- Last update: 14.04.2020
 -- Platform :   ModelSim - Starter Edition 10.5b
 -- Language:    VHDL 1076-2002
 --------------------------------------------------------------------------------
@@ -133,6 +133,9 @@ begin
   s_rst_i <= '0' after T_RST;
   s_clk_i <= not s_clk_i after T_VGA / 2;
 
+  ------------------------------------------------------------------------------
+  -- Simulate push buttons to move object around
+  ------------------------------------------------------------------------------
   p_pb: process
   begin
     s_pb_i <= (others => '0');

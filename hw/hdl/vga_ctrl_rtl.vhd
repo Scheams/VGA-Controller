@@ -5,8 +5,8 @@
 -- File :       vga_ctrl_rtl.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 06.04.2020
--- Platform :   ModelSim - Starter Edition 10.5b
+-- Last update: 14.04.2020
+-- Platform :   ModelSim - Starter Edition 10.5b, Vivado 2019.2
 -- Language:    VHDL 1076-2008
 --------------------------------------------------------------------------------
 -- Description: The "VGA Control" unit controlls the hardware operation that

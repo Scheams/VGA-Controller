@@ -5,8 +5,8 @@
 -- File :       ctrl_mem2_rtl.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 06.04.2020
--- Platform :   ModelSim - Starter Edition 10.5b
+-- Last update: 14.04.2020
+-- Platform :   ModelSim - Starter Edition 10.5b, Vivado 2019.2
 -- Language:    VHDL 1076-2002
 --------------------------------------------------------------------------------
 -- Description: The "Memory Control 1" unit reads the stored information from
@@ -28,6 +28,11 @@ use work.vga_specs_pkg.all;
 
 architecture rtl of ctrl_mem2 is
 
+  ------------------------------------------------------------------------------
+  -- SIGNALS
+  ------------------------------------------------------------------------------
+
+
   signal s_prev_px : std_logic_vector (g_specs.addr.n_h-1 downto 0);
   signal s_cnt_img : unsigned (g_img.n_rom-1 downto 0);
   signal s_img     : std_logic;
@@ -41,6 +46,9 @@ architecture rtl of ctrl_mem2 is
 
 begin
 
+  ------------------------------------------------------------------------------
+  -- Use ROM data if image is enabled, otherwise create white background
+  ------------------------------------------------------------------------------
   p_rgb: process (s_img, rom_data_i)
   begin
     if s_img = '1' then
@@ -52,12 +60,16 @@ begin
     end if;
   end process p_rgb;
 
+  ------------------------------------------------------------------------------
+  -- Convert pixel information into ROM addressing to retrieve RGB data.
+  -- Moreover handle button inputs to change image offset.
+  ------------------------------------------------------------------------------
   p_process: process (rst_i, clk_i)
   begin
 
     if clk_i'event and (clk_i = '1') then
 
-      -- Reset counters and colours
+      -- Reset counters and colours (Synch reset for ROM)
       if rst_i = '1' then
         s_cnt_img <= (others => '0');
         rom_addr_o <= (others => '0');
@@ -69,31 +81,39 @@ begin
 
       else
 
+        -- Check rising edges of pushbuttons and add/subtract offset
+        -- Move right
         if s_pb_prev(0) = '0' and pb_i(0) = '1' then
           if s_h_tmp_offset < g_specs.px_h.visible_area - g_img.width then
             s_h_tmp_offset <= s_h_tmp_offset + 30;
           end if;
         end if;
 
+        -- Move left
         if s_pb_prev(1) = '0' and pb_i(1) = '1' then
           if s_h_tmp_offset >= 30 then
             s_h_tmp_offset <= s_h_tmp_offset - 30;
           end if;
         end if;
 
+        -- Move down
         if s_pb_prev(2) = '0' and pb_i(2) = '1' then
           if s_v_tmp_offset >= 30 then
             s_v_tmp_offset <= s_v_tmp_offset - 30;
           end if;
         end if;
 
+        -- Move up
         if s_pb_prev(3) = '0' and pb_i(3) = '1' then
           if s_v_tmp_offset < g_specs.ln_v.visible_area - g_img.height then
             s_v_tmp_offset <= s_v_tmp_offset + 30;
           end if;
         end if;
 
+        -- Check if pixels changed
         if s_prev_px /= h_px_i then
+
+          -- Check if pixel information is inside picture, set flag
           if (unsigned(h_px_i) >= s_h_offset) and
             (unsigned(h_px_i) < g_img.width+s_h_offset) and
             (unsigned(v_px_i) >= s_v_offset) and
@@ -104,15 +124,20 @@ begin
             s_img <= '0';
           end if;
 
+          -- Frame start, reset counter and take over temp offset
           if unsigned(v_px_i) = 0 and unsigned(h_px_i) = 0 then
             s_cnt_img <= (others => '0');
             rom_addr_o <= (others => '0');
 
             s_h_offset <= s_h_tmp_offset;
             s_v_offset <= s_v_tmp_offset;
+
+          -- Limit ROM output to max address
           elsif unsigned(s_cnt_img) >= g_img.size_rom-1 then
             rom_addr_o <= std_logic_vector(
                           to_unsigned(g_img.size_rom-1, g_img.n_rom));
+
+          -- Increase ROM address
           else
             rom_addr_o <= std_logic_vector(s_cnt_img + 1);
           end if;

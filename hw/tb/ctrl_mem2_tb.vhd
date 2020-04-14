@@ -5,7 +5,7 @@
 -- File :       ctrl_mem2_tb.vhd
 -- Author :     Christoph Amon
 -- Company :    FH Technikum
--- Last update: 06.04.2020
+-- Last update: 14.04.2020
 -- Platform :   ModelSim - Starter Edition 10.5b
 -- Language:    VHDL 1076-2002
 --------------------------------------------------------------------------------
@@ -31,6 +31,10 @@ end entity ctrl_mem2_tb;
 
 architecture sim of ctrl_mem2_tb is
 
+  ------------------------------------------------------------------------------
+  -- COMPONENTS
+  ------------------------------------------------------------------------------
+
   component ctrl_mem2
     generic (
       g_specs   : t_vga_specs;
@@ -51,6 +55,11 @@ architecture sim of ctrl_mem2_tb is
     );
   end component ctrl_mem2;
 
+  ------------------------------------------------------------------------------
+  -- SIGNALS
+  ------------------------------------------------------------------------------
+
+  -- In- and outputs of DUT
   signal s_rst_i       : std_logic := '1';
   signal s_clk_i       : std_logic := '1';
   signal s_v_px_i      : std_logic_vector (SPECS.addr.n_v-1 downto 0);
@@ -62,6 +71,7 @@ architecture sim of ctrl_mem2_tb is
   signal s_green_o     : std_logic_vector (COLOUR.n_rgb-1 downto 0);
   signal s_blue_o      : std_logic_vector (COLOUR.n_rgb-1 downto 0);
 
+  -- State signals for VGA output
   signal s_v_back_porch  : std_logic := '0';
   signal s_v_front_porch : std_logic := '0';
   signal s_h_back_porch  : std_logic := '0';
@@ -69,6 +79,9 @@ architecture sim of ctrl_mem2_tb is
 
 begin
 
+  ------------------------------------------------------------------------------
+  -- Device under test
+  ------------------------------------------------------------------------------
   u_dut: ctrl_mem2
   generic map (
     g_specs   => SPECS,
